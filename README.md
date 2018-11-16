@@ -5,12 +5,12 @@ Docker Containers for bitwarden_rs Backup.
 
 ## Usage
 ```sh
-docker run --name bitwarden_backup --volumes-from=bitwarden registry.gitlab.com/1o/bitwarden_rs-backup
+docker run -d --restart=always --name bitwarden_backup --volumes-from=bitwarden registry.gitlab.com/1o/bitwarden_rs-backup/bw_backup
 ```
 
 Example for hourly backups
 ```
-docker run --name bitwarden_backup --volumes-from=bitwarden -e CRON_TIME="0 * * * *" registry.gitlab.com/1o/bitwarden_rs-backup
+docker run -d --restart=always --name bitwarden_backup --volumes-from=bitwarden -e CRON_TIME="0 * * * *" registry.gitlab.com/1o/bitwarden_rs-backup/bw_backup:latest
 ```
 
 ## Environment variables
