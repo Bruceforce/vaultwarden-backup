@@ -13,7 +13,16 @@ variables:
   services:
     - docker:dind
   tags:
-  - shared
+    - shared
+
+build_master:
+  <<: *docker_build
+  script:
+    - *docker_login
+    - docker build --pull -t "$IMAGE_NAME" .
+    - docker push "$IMAGE_NAME"
+  only:
+    - master 
 
 build:
   <<: *docker_build
@@ -21,3 +30,5 @@ build:
     - *docker_login
     - docker build --pull -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" .
     - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
+  except:
+    - master
