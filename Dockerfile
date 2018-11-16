@@ -7,7 +7,7 @@ COPY start.sh backup.sh /
 
 ENV DB_FILE /data/db.sqlite3
 ENV BACKUP_FILE /data/db-backup.sqlite3
-ENV CRON_TIME "* * * * *"
+ENV CRON_TIME "0 5 * * *"
 
 RUN chmod 700 /start.sh /backup.sh
 
