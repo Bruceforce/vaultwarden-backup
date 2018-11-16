@@ -1,4 +1,4 @@
-tages:
+stages:
   - build:docker
 
 variables:
