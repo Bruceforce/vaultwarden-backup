@@ -1,0 +1,23 @@
+tages:
+  - build:docker
+
+variables:
+  IMAGE_NAME: "$CI_REGISTRY_IMAGE/bw_backup"
+
+.docker_login: &docker_login
+  docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+
+.docker_build_template: &docker_build
+  stage: build:docker
+  image: docker:latest
+  services:
+    - docker:dind
+  tags:
+  - shared
+
+build:
+  <<: *docker_build
+  script:
+    - *docker_login
+    - docker build --pull -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" .
+    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
