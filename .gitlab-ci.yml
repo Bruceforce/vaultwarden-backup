@@ -24,6 +24,15 @@ build_master:
   only:
     - master 
 
+build_master_rpi3:
+  <<: *docker_build
+  script:
+    - *docker_login
+    - docker build --pull -t "$IMAGE_NAME:rpi3" .
+    - docker push "$IMAGE_NAME:rpi3"
+  tags:
+    - rpi3
+
 build:
   <<: *docker_build
   script:
