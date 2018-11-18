@@ -24,5 +24,5 @@ then
   /usr/sbin/crond -L /var/log/cron.log
 fi
 
-echo "$(date) - Container started" > "$LOGFILE"
+echo "$(date "+%F %T") - Container started" > "$LOGFILE"
 tail -F "$LOGFILE"
