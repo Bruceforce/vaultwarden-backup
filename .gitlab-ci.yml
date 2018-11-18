@@ -50,7 +50,7 @@ build:
     - docker build --pull -t "$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG/bw_backup" .
     - docker push "$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG/bw_backup"
     - *dockerhub_login
-    - docker build --pull -t "$IMAGE_NAME_DOCKERHUB:$CI_COMMIT_REF_SLUG" .
+    - docker tag "$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG/bw_backup $IMAGE_NAME_DOCKERHUB:$CI_COMMIT_REF_SLUG" 
     - docker push "$IMAGE_NAME_DOCKERHUB:$CI_COMMIT_REF_SLUG"
   except:
     - master
