@@ -32,6 +32,8 @@ build_master_rpi3:
     - docker push "$IMAGE_NAME:rpi3"
   tags:
     - rpi3
+  only:
+    - master
 
 build:
   <<: *docker_build
