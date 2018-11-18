@@ -26,7 +26,8 @@ build_master:
     - docker build --pull -t "$IMAGE_NAME" .
     - docker push "$IMAGE_NAME"
     - *dockerhub_login
-    - docker push "$IMAGE_NAME"
+    - docker tag "$IMAGE_NAME" "$IMAGE_NAME_DOCKERHUB"
+    - docker push "$IMAGE_NAME_DOCKERHUB"
   only:
     - master
 
@@ -37,7 +38,8 @@ build_master_rpi3:
     - docker build --pull -t "$IMAGE_NAME:rpi3" .
     - docker push "$IMAGE_NAME:rpi3"
     - *dockerhub_login
-    - docker push "$IMAGE_NAME:rpi3"
+    - docker tag "$IMAGE_NAME:rpi3" "$IMAGE_NAME_DOCKERHUB:rpi3"
+    - docker push "$IMAGE_NAME_DOCKERHUB:rpi3"
   tags:
     - rpi3
   only:
@@ -47,10 +49,9 @@ build:
   <<: *docker_build
   script:
     - *docker_login
-    - docker build --pull -t "$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG/bw_backup" .
+    - docker build --pull -t "$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG/bw_backup" -t "$IMAGE_NAME_DOCKERHUB:$CI_COMMIT_REF_SLUG" .
     - docker push "$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG/bw_backup"
     - *dockerhub_login
-    - docker tag "$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG/bw_backup" "$IMAGE_NAME_DOCKERHUB:$CI_COMMIT_REF_SLUG" 
     - docker push "$IMAGE_NAME_DOCKERHUB:$CI_COMMIT_REF_SLUG"
   except:
     - master
