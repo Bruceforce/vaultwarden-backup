@@ -3,7 +3,7 @@ stages:
 
 variables:
   IMAGE_NAME: "$CI_REGISTRY_IMAGE"
-  IMAGE_NAME_DOCKERHUB: "bruceforce/bw_backup"
+  IMAGE_NAME_DOCKERHUB: "index.docker.io/bruceforce/bw_backup"
 
 .docker_login: &docker_login
   docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
