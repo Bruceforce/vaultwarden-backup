@@ -3,6 +3,7 @@ stages:
 
 variables:
   IMAGE_NAME: "$CI_REGISTRY_IMAGE/bw_backup"
+  IMAGE_NAME_DOCKERHUB: "bw_backup"
 
 .docker_login: &docker_login
   docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
@@ -49,7 +50,7 @@ build:
     - docker build --pull -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" .
     - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
     - *dockerhub_login
-    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
+    - docker push "$IMAGE_NAME_DOCKERHUB:$CI_COMMIT_REF_SLUG"
   except:
     - master
 
