@@ -24,7 +24,7 @@ You can use the crontab of your host to schedule the backup and the container wi
 
 Example using the integrated Backup script. You can use Environment variables for database and backup location
 ```sh
-docker run --rm --volumes-from=bitwarden registry.gitlab.com/1o/bitwarden_rs-backup/bw_backup /bachkup.sh
+docker run --rm --volumes-from=bitwarden registry.gitlab.com/1o/bitwarden_rs-backup/bw_backup /backup.sh
 ```
 
 If you want to run the sqlite commands manually you can use the following command
