@@ -38,4 +38,4 @@ docker run --rm --volumes-from=bitwarden registry.gitlab.com/1o/bitwarden_rs-bac
 | DB_FILE | Path to the Bitwarden sqlite3 database |
 | BACKUP_FILE | Path to the desired backup location |
 | CRON_TIME | Cronjob format "Minute Hour Day_of_month Month_of_year Day_of_week Year" |
-
+| TIMESTAMP | Set to `true` to append timestamp to the `BACKUP_FILE` |
