@@ -2,10 +2,14 @@ stages:
   - build:docker
 
 variables:
-  IMAGE_NAME: "$CI_REGISTRY_IMAGE/bw_backup"
+  IMAGE_NAME: "$CI_REGISTRY_IMAGE"
+  IMAGE_NAME_DOCKERHUB: "index.docker.io/bruceforce/bw_backup"
 
 .docker_login: &docker_login
   docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+
+.dockerhub_login: &dockerhub_login
+  docker login -u "$DOCKERHUB_USER" -p "$DOCKERHUB_PASSWORD" $DOCKERHUB_REGISTRY
 
 .docker_build_template: &docker_build
   stage: build:docker
@@ -19,17 +23,20 @@ build_master:
   <<: *docker_build
   script:
     - *docker_login
-    - docker build --pull -t "$IMAGE_NAME" .
+    - docker build --pull -t "$IMAGE_NAME" -t "$IMAGE_NAME_DOCKERHUB" .
     - docker push "$IMAGE_NAME"
   only:
-    - master 
+    - master
 
 build_master_rpi3:
   <<: *docker_build
   script:
     - *docker_login
-    - docker build --pull -t "$IMAGE_NAME:rpi3" .
+    - docker build --pull -t "$IMAGE_NAME:rpi3" -t "$IMAGE_NAME_DOCKERHUB:rpi3" .
     - docker push "$IMAGE_NAME:rpi3"
+      # dockerhub can't autobuild for arm - so push this build to dockerhub
+    - *dockerhub_login
+    - docker push "$IMAGE_NAME_DOCKERHUB:rpi3"
   tags:
     - rpi3
   only:
@@ -39,7 +46,8 @@ build:
   <<: *docker_build
   script:
     - *docker_login
-    - docker build --pull -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" .
-    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
+    - docker build --pull -t "$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG/bw_backup" .
+    - docker push "$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG/bw_backup"
   except:
     - master
+
