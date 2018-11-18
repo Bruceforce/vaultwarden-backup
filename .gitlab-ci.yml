@@ -7,6 +7,9 @@ variables:
 .docker_login: &docker_login
   docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
 
+.dockerhub_login: &dockerhub_login
+  docker login -u "$DOCKERHUB_USER" -p "$DOCKERHUB_PASSWORD" $DOCKERHUB_REGISTRY
+
 .docker_build_template: &docker_build
   stage: build:docker
   image: docker:latest
@@ -21,14 +24,18 @@ build_master:
     - *docker_login
     - docker build --pull -t "$IMAGE_NAME" .
     - docker push "$IMAGE_NAME"
+    - *dockerhub_login
+    - docker push "$IMAGE_NAME"
   only:
-    - master 
+    - master
 
 build_master_rpi3:
   <<: *docker_build
   script:
     - *docker_login
     - docker build --pull -t "$IMAGE_NAME:rpi3" .
+    - docker push "$IMAGE_NAME:rpi3"
+    - *dockerhub_login
     - docker push "$IMAGE_NAME:rpi3"
   tags:
     - rpi3
@@ -41,5 +48,8 @@ build:
     - *docker_login
     - docker build --pull -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" .
     - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
+    - *dockerhub_login
+    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
   except:
     - master
+
