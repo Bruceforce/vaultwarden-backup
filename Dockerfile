@@ -6,7 +6,7 @@ RUN apk add --update \
 COPY start.sh backup.sh /
 
 ENV DB_FILE /data/db.sqlite3
-ENV BACKUP_FILE /data/db-backup.sqlite3
+ENV BACKUP_FILE /data/db_backup/backup.sqlite3
 ENV CRON_TIME "0 5 * * *"
 ENV TIMESTAMP false
 
