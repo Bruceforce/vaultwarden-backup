@@ -25,6 +25,8 @@ build_master:
     - *docker_login
     - docker build --pull -t "$IMAGE_NAME" -t "$IMAGE_NAME_DOCKERHUB" .
     - docker push "$IMAGE_NAME"
+    - *dockerhub_login
+    - docker push "$IMAGE_NAME_DOCKERHUB"
   only:
     - master
 
@@ -34,7 +36,6 @@ build_master_rpi3:
     - *docker_login
     - docker build --pull -t "$IMAGE_NAME:rpi3" -t "$IMAGE_NAME_DOCKERHUB:rpi3" .
     - docker push "$IMAGE_NAME:rpi3"
-      # dockerhub can't autobuild for arm - so push this build to dockerhub
     - *dockerhub_login
     - docker push "$IMAGE_NAME_DOCKERHUB:rpi3"
   tags:
