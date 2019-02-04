@@ -11,12 +11,12 @@ A cron daemon is running inside the container and the container keeps running in
 
 Start backup container with default settings (automatic backup at 5 am)
 ```sh
-docker run -d --restart=always --name bitwarden_backup --volumes-from=bitwarden registry.gitlab.com/1o/bitwarden_rs-backup
+docker run -d --restart=always --name bitwarden_backup --volumes-from=bitwarden bruceforce/bw_backup
 ```
 
 Example for hourly backups
 ```sh
-docker run -d --restart=always --name bitwarden_backup --volumes-from=bitwarden -e CRON_TIME="0 * * * *" registry.gitlab.com/1o/bitwarden_rs-backup
+docker run -d --restart=always --name bitwarden_backup --volumes-from=bitwarden -e CRON_TIME="0 * * * *" bruceforce/bw_backup
 ```
 
 ### Manual Backups
@@ -24,12 +24,12 @@ You can use the crontab of your host to schedule the backup and the container wi
 
 Example using the integrated Backup script. You can use Environment variables for database and backup location
 ```sh
-docker run --rm --volumes-from=bitwarden registry.gitlab.com/1o/bitwarden_rs-backup /backup.sh
+docker run --rm --volumes-from=bitwarden bruceforce/bw_backup /backup.sh
 ```
 
 If you want to run the sqlite commands manually you can use the following command
 ```sh
-docker run --rm --volumes-from=bitwarden registry.gitlab.com/1o/bitwarden_rs-backup sqlite3 $DB_FILE ".backup $BACKUP_FILE"
+docker run --rm --volumes-from=bitwarden bruceforce/bw_backup sqlite3 $DB_FILE ".backup $BACKUP_FILE"
 ```
 
 ## Environment variables
