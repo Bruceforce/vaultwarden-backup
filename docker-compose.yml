@@ -1,0 +1,54 @@
+---
+version: '3.7'
+services:
+# this will build the image - usually not needed
+#  bw_test:
+#    build: ./
+#    container_name: bw_test
+#    ports:
+#     - 8003:80
+#    volumes:
+#     - bitwarden:/data/
+#     - ./test:/backup_folder/
+#    restart: on-failure
+#    init: true
+#    environment:
+#      - DB_FILE=/data/db.sqlite3
+#        # uncomment this if you want your backup to be written to ./backup/ folder"
+#      - BACKUP_FILE=/backup_folder/db_backup/backup.sqlite3
+#      - CRON_TIME=*/1 * * * *
+#      - TIMESTAMP=false
+#      - UID=0
+#      - GID=0
+
+  bitwarden:
+    image: mprasil/bitwarden:latest
+    container_name: bitwarden2
+    ports:
+      - 8002:80
+    volumes:
+      - bitwarden:/data/
+    restart: on-failure
+
+  bw_backup:
+    image: bruceforce/bw_backup
+    container_name: bw_backup
+    restart: on-failure
+    depends_on:
+      - bitwarden
+    volumes:
+      - bitwarden:/data/
+        # uncomment this if you want your backup to be written to ./backup/ folder"
+        # - ./backup:/backup_folder/
+    environment:
+      - DB_FILE=/data/db.sqlite3
+        # uncomment this if you want your backup to be written to ./backup/ folder"
+        # - BACKUP_FILE=/backup_folder/db_backup/backup.sqlite3
+      - BACKUP_FILE=/data/db_backup/backup.sqlite3
+      - CRON_TIME=0 5 * * *
+      - TIMESTAMP=false
+      - UID=0
+      - GID=0
+
+volumes:
+  bitwarden:
