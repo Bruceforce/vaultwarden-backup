@@ -35,7 +35,11 @@ docker run --rm --volumes-from=bitwarden bruceforce/bw_backup sqlite3 $DB_FILE "
 ## Environment variables
 | ENV | Description |
 | ----- | ----- |
-| DB_FILE | Path to the Bitwarden sqlite3 database |
-| BACKUP_FILE | Path to the desired backup location |
+| DB_FILE | Path to the Bitwarden sqlite3 database *inside* the container |
+| BACKUP_FILE | Path to the desired backup location *inside* the container |
 | CRON_TIME | Cronjob format "Minute Hour Day_of_month Month_of_year Day_of_week Year" |
 | TIMESTAMP | Set to `true` to append timestamp to the `BACKUP_FILE` |
+| UID | User ID to run the cron job with |
+| GID | Group ID to run the cron job with |
+| LOGFILE | Path to the logfile *inside* the container |
+| CRONFILE | Path to the cron file *inside* the container |

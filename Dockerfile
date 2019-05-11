@@ -1,16 +1,28 @@
 FROM alpine:latest
 
-RUN apk add --update \
-    sqlite
+RUN addgroup -S app && adduser -S -G app app
 
-COPY start.sh backup.sh /
+RUN apk add --no-cache \
+    sqlite \
+    busybox-suid \
+    su-exec
 
 ENV DB_FILE /data/db.sqlite3
-ENV BACKUP_FILE /data/db-backup/backup.sqlite3
+ENV BACKUP_FILE /data/db_backup/backup.sqlite3
 ENV CRON_TIME "0 5 * * *"
 ENV TIMESTAMP false
+ENV UID 100
+ENV GID 100
+ENV CRONFILE /etc/crontabs/root
+ENV LOGFILE /app/log/backup.log
 
-RUN chmod 700 /start.sh /backup.sh
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY backup.sh /app/
 
-CMD /start.sh
+RUN mkdir /app/log/ \
+    && chown -R app:app /app/ \
+    && chmod -R 777 /app/ \
+    && chmod +x /usr/local/bin/entrypoint.sh 
+#    && echo "\$CRON_TIME \$BACKUP_CMD >> \$LOGFILE 2>&1" | crontab -
 
+ENTRYPOINT ["entrypoint.sh"]
