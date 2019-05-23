@@ -1,9 +1,23 @@
 #!/bin/sh
+# vim: tabstop=2 shiftwidth=2 expandtab
 
 #set -ux
 
 BACKUP_CMD="/sbin/su-exec ${UID}:${GID} /app/backup.sh"
 
+# For compatibility reasons
+if [ "$1" = "/backup.sh" ]; then
+  >&2 echo "Using /backup.sh is deprecated and will be removed in future versions! Please use \`manual\` as arugment instead"
+  $BACKUP_CMD
+fi
+
+# Just run the backup script
+if [ "$1" = "manual" ]; then
+  $BACKUP_CMD
+fi
+exit 0
+
+# Initialize cron
 echo "Running as $(id)"
 if [ "$(id -u)" -eq 0 ] && [ "$(grep -c "$BACKUP_CMD" "$CRONFILE")" -eq 0 ]; then
   echo "Initalizing..."

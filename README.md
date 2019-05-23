@@ -24,12 +24,12 @@ You can use the crontab of your host to schedule the backup and the container wi
 
 Example using the integrated Backup script. You can use Environment variables for database and backup location
 ```sh
-docker run --rm --volumes-from=bitwarden bruceforce/bw_backup /backup.sh
+docker run --rm --volumes-from=bitwarden bruceforce/bw_backup manual
 ```
 
 If you want to run the sqlite commands manually you can use the following command
 ```sh
-docker run --rm --volumes-from=bitwarden bruceforce/bw_backup sqlite3 $DB_FILE ".backup $BACKUP_FILE"
+docker run --rm --volumes-from=bitwarden --entrypoint sqlite3 bruceforce/bw_backup $DB_FILE ".backup $BACKUP_FILE"
 ```
 
 ## Environment variables
