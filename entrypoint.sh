@@ -1,7 +1,7 @@
 #!/bin/sh
 # vim: tabstop=2 shiftwidth=2 expandtab
 
-#set -ux
+#set -x
 
 BACKUP_CMD="/sbin/su-exec ${UID}:${GID} /app/backup.sh"
 
@@ -15,7 +15,6 @@ fi
 if [ "$1" = "manual" ]; then
   $BACKUP_CMD
 fi
-exit 0
 
 # Initialize cron
 echo "Running as $(id)"
@@ -23,11 +22,12 @@ if [ "$(id -u)" -eq 0 ] && [ "$(grep -c "$BACKUP_CMD" "$CRONFILE")" -eq 0 ]; the
   echo "Initalizing..."
   echo "$CRON_TIME $BACKUP_CMD >> $LOGFILE 2>&1" | crontab -
 
-  # Start crond if it's not running
-  pgrep crond > /dev/null 2>&1
-  if [ $? -ne 0 ]; then
-    /usr/sbin/crond -L /app/log/cron.log
-  fi
+fi
+
+# Start crond if it's not running
+pgrep crond > /dev/null 2>&1
+if [ $? -ne 0 ]; then
+  /usr/sbin/crond -L /app/log/cron.log
 fi
 
 # Restart script as user "app:app"
