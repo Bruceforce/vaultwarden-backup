@@ -34,6 +34,7 @@ services:
     image: bruceforce/bw_backup
     container_name: bw_backup
     restart: on-failure
+    init: true
     depends_on:
       - bitwarden
     volumes:
