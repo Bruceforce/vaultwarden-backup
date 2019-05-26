@@ -22,15 +22,20 @@ docker run -d --restart=always --name bitwarden_backup --volumes-from=bitwarden 
 ### Manual Backups
 You can use the crontab of your host to schedule the backup and the container will only be running during the backup process.
 
-Example using the integrated Backup script. You can use Environment variables for database and backup location
-```sh
-docker run --rm --volumes-from=bitwarden bruceforce/bw_backup manual
-```
-
-If you want to run the sqlite commands manually you can use the following command
 ```sh
 docker run --rm --volumes-from=bitwarden --entrypoint sqlite3 bruceforce/bw_backup $DB_FILE ".backup $BACKUP_FILE"
 ```
+
+Keep in mind that the above command will be executed inside the container. So
+- `$DB_FILE` is the path to the bitwarden database which is normally locatated at `/data/db.sqlite3`
+- `$BACKUP_FILE` can be any place inside the container. Easiest would be to set it to `/data/backup.sqlite3` which will create the backup near the original database file.
+If you want the backed up file to be stored outside the container you have to mount
+a directory by adding `-v <PATH_ON_YOUR_HOST>:<PATH_INSIDE_CONTAINER>`. The complete command could look like this
+
+```sh
+docker run --rm --volumes-from=bitwarden -v /tmp/myBackup:/myBackup --entrypoint sqlite3 bruceforce/bw_backup /data/db.sqlite3 ".backup /myBackup/backup.sqlite3"
+```
+
 
 ## Environment variables
 | ENV | Description |
