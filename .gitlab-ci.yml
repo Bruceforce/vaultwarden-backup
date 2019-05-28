@@ -37,7 +37,7 @@ build_master_rpi3:
     - docker build --pull -t "$IMAGE_NAME:rpi3" -t "$IMAGE_NAME_DOCKERHUB:${CI_COMMIT_TAG:-latest}" .
     - docker push "$IMAGE_NAME:rpi3"
     - *dockerhub_login
-    - docker push "$IMAGE_NAME_DOCKERHUB:${CI_COMMIT_TAG-rpi3:-latest-rpi3}"
+    - docker push "$IMAGE_NAME_DOCKERHUB:${CI_COMMIT_TAG:-latest}-rpi3"
   tags:
     - rpi3
   only:
