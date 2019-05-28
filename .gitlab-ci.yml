@@ -29,6 +29,7 @@ build_master:
     - docker push "$IMAGE_NAME_DOCKERHUB:${CI_COMMIT_TAG:-latest}"
   only:
     - master
+    - tags
 
 build_master_rpi3:
   <<: *docker_build
@@ -42,6 +43,7 @@ build_master_rpi3:
     - rpi3
   only:
     - master
+    - tags
 
 build:
   <<: *docker_build
