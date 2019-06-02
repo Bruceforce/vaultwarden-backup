@@ -28,8 +28,13 @@ build_master:
     - *dockerhub_login
     - docker push "$IMAGE_NAME_DOCKERHUB:${CI_COMMIT_TAG:-latest}"
   only:
-    - master
-    - tags
+    refs:
+      - master
+      - tags
+    changes:
+      - Dockerfile
+      - backup.sh
+      - entrypoint.sh
 
 build_master_rpi3:
   <<: *docker_build
@@ -42,8 +47,13 @@ build_master_rpi3:
   tags:
     - rpi3
   only:
-    - master
-    - tags
+    refs:
+      - master
+      - tags
+    changes:
+      - Dockerfile
+      - backup.sh
+      - entrypoint.sh
 
 build:
   <<: *docker_build
