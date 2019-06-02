@@ -1,9 +1,7 @@
 # bitwarden_rs Backup
-
 Docker Containers for [bitwarden_rs](https://github.com/dani-garcia/bitwarden_rs) Backup.
 
 ## Usage
-
 The default tag `latest` should be used for a x86-64 system. If you try to run the container on a raspberry pi 3 you should use the tag `rpi3`. Also make sure that your **bitwarden_rs container is named `bitwarden`** otherwise you have to replace the container name in the `--volumes-from` section of the `docker run` call.
 
 ### Automatic Backups 
@@ -36,7 +34,6 @@ a directory by adding `-v <PATH_ON_YOUR_HOST>:<PATH_INSIDE_CONTAINER>`. The comp
 docker run --rm --volumes-from=bitwarden -v /tmp/myBackup:/myBackup --entrypoint sqlite3 bruceforce/bw_backup /data/db.sqlite3 ".backup /myBackup/backup.sqlite3"
 ```
 
-
 ## Environment variables
 | ENV | Description |
 | ----- | ----- |
@@ -48,3 +45,14 @@ docker run --rm --volumes-from=bitwarden -v /tmp/myBackup:/myBackup --entrypoint
 | GID | Group ID to run the cron job with |
 | LOGFILE | Path to the logfile *inside* the container |
 | CRONFILE | Path to the cron file *inside* the container |
+
+## Common erros
+### Wrong permissions
+`Error: unable to open database file` is most likely caused by permission errors.
+Note that sqlite3 creates a lock file in the source directory while running the backup.
+So source *AND* destination have to be +rw for the user. You can set the user and group ID
+via the `UID` and `GID` environment variables like described above.
+
+### Wrong timestamp
+If you need timestamps in your local timezone you should mount `/etc/timezone:/etc/timezone:ro` and `/etc/localtime:/etc/localtime:ro`
+like it's done in the [docker-compose.yml](docker-compose.yml).
