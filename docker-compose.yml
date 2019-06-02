@@ -39,6 +39,8 @@ services:
       - bitwarden
     volumes:
       - bitwarden:/data/
+     - /etc/timezone:/etc/timezone:ro
+     - /etc/localtime:/etc/localtime:ro
         # uncomment this if you want your backup to be written to ./backup/ folder"
         # - ./backup:/backup_folder/
     environment:
