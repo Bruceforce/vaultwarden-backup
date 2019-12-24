@@ -17,6 +17,11 @@ Example for hourly backups
 docker run -d --restart=always --name bitwarden_backup --volumes-from=bitwarden -e CRON_TIME="0 * * * *" bruceforce/bw_backup
 ```
 
+Example for backups that delete after 30 days
+```sh
+docker run -d --restart=always --name bitwarden_backup --volumes-from=bitwarden -e DELETE_AFTER=30 bruceforce/bw_backup
+```
+
 ### Manual Backups
 You can use the crontab of your host to schedule the backup and the container will only be running during the backup process.
 
@@ -45,6 +50,7 @@ docker run --rm --volumes-from=bitwarden -v /tmp/myBackup:/myBackup --entrypoint
 | GID | Group ID to run the cron job with |
 | LOGFILE | Path to the logfile *inside* the container |
 | CRONFILE | Path to the cron file *inside* the container |
+| DELETE_AFTER | Delete old backups after X many days |
 
 ## Common erros
 ### Wrong permissions
