@@ -5,6 +5,13 @@
 
 BACKUP_CMD="/sbin/su-exec ${UID}:${GID} /app/backup.sh"
 
+# Preparation
+if [ ! -d $(dirname "$BACKUP_FILE") ]
+then
+  mkdir -p $(dirname "$BACKUP_FILE")
+  chown $UID:$GID $(dirname "$BACKUP_FILE")
+fi
+
 # For compatibility reasons
 if [ "$1" = "/backup.sh" ]; then
   >&2 echo "Using /backup.sh is deprecated and will be removed in future versions! Please use \`manual\` as arugment instead"
@@ -33,12 +40,6 @@ fi
 # Restart script as user "app:app"
 if [ "$(id -u)" -eq 0 ]; then
   exec su-exec app:app "$0" "$@"
-fi
-
-if [ ! -e "$DB_FILE" ]
-then 
-  echo "Database $DB_FILE not found!\nPlease check if you mounted the bitwarden_rs volume with '--volumes-from=bitwarden'"!
-  exit 1;
 fi
 
 echo "$(date "+%F %T") - Container started" > "$LOGFILE"

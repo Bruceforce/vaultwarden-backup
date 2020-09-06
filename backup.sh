@@ -1,8 +1,10 @@
 #!/bin/sh
 
-if [ ! -d $(dirname "$BACKUP_FILE") ]
-then
-  mkdir -p $(dirname "$BACKUP_FILE")
+# Check if db file is accessible and exit otherwise
+if [ ! -e "$DB_FILE" ]
+then 
+  echo "Database $DB_FILE not found!\nPlease check if you mounted the bitwarden_rs volume with '--volumes-from=bitwarden'"!
+  exit 1;
 fi
 
 if [ $TIMESTAMP = true ]
