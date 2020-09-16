@@ -15,7 +15,7 @@ else
 fi
 
 /usr/bin/sqlite3 $DB_FILE ".backup $FINAL_BACKUP_FILE"
-if [ $? -eq 0 ] 
+if [ $? -eq 0 ]
 then 
   echo "$(date "+%F %T") - Backup successfull"
 else

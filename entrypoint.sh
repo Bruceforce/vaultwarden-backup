@@ -9,7 +9,8 @@ BACKUP_CMD="/sbin/su-exec ${UID}:${GID} /app/backup.sh"
 if [ ! -d $(dirname "$BACKUP_FILE") ]
 then
   mkdir -p $(dirname "$BACKUP_FILE")
-  chown $UID:$GID $(dirname "$BACKUP_FILE")
+  chown -R $UID:$GID $(dirname "$BACKUP_FILE")
+  chmod -R "$BACKUP_FILE_PERMISSIONS" $(dirname "$BACKUP_FILE")
 fi
 
 # For compatibility reasons
