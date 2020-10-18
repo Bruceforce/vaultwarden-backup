@@ -5,12 +5,14 @@
 
 BACKUP_CMD="/sbin/su-exec ${UID}:${GID} /app/backup.sh"
 
+echo "Running $(basename "$0") as $(id)"
+
 # Preparation
-if [ ! -d $(dirname "$BACKUP_FILE") ]
+BACKUP_DIR=$(dirname "$BACKUP_FILE")
+if [ ! -d "$BACKUP_DIR" ]
 then
-  mkdir -p $(dirname "$BACKUP_FILE")
-  chown -R $UID:$GID $(dirname "$BACKUP_FILE")
-  chmod -R "$BACKUP_FILE_PERMISSIONS" $(dirname "$BACKUP_FILE")
+  echo "$BACKUP_DIR not exists. Creating it with owner $UID:$GID and permissions $BACKUP_FILE_PERMISSIONS."
+  install -o $UID -g $GID -m $BACKUP_FILE_PERMISSIONS -d $BACKUP_DIR
 fi
 
 # For compatibility reasons
@@ -25,9 +27,9 @@ if [ "$1" = "manual" ]; then
 fi
 
 # Initialize cron
-echo "Running as $(id)"
 if [ "$(id -u)" -eq 0 ] && [ "$(grep -c "$BACKUP_CMD" "$CRONFILE")" -eq 0 ]; then
   echo "Initalizing..."
+  echo "Writing backup command \"$BACKUP_CMD\" to cron."
   echo "$CRON_TIME $BACKUP_CMD >> $LOGFILE 2>&1" | crontab -
 
 fi
@@ -40,6 +42,7 @@ fi
 
 # Restart script as user "app:app"
 if [ "$(id -u)" -eq 0 ]; then
+  echo "Restarting $(basename "$0") as app:app"
   exec su-exec app:app "$0" "$@"
 fi
 

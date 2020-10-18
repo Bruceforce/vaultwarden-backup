@@ -44,7 +44,7 @@ docker run --rm --volumes-from=bitwarden -v /tmp/myBackup:/myBackup --entrypoint
 | ----- | ----- |
 | DB_FILE | Path to the Bitwarden sqlite3 database *inside* the container |
 | BACKUP_FILE | Path to the desired backup location *inside* the container |
-| BACKUP_FILE_PERMISSIONS | Sets the permissions of the backup file |
+| BACKUP_FILE_PERMISSIONS | Sets the permissions of the backup file (**CAUTION** [^1] |
 | CRON_TIME | Cronjob format "Minute Hour Day_of_month Month_of_year Day_of_week Year" |
 | TIMESTAMP | Set to `true` to append timestamp to the `BACKUP_FILE` |
 | UID | User ID to run the cron job with |
@@ -52,6 +52,8 @@ docker run --rm --volumes-from=bitwarden -v /tmp/myBackup:/myBackup --entrypoint
 | LOGFILE | Path to the logfile *inside* the container |
 | CRONFILE | Path to the cron file *inside* the container |
 | DELETE_AFTER | Delete old backups after X many days |
+
+[^1]: The permissions should at least be 700 since the backup folder itself gets the same permissions and with 600 it would not be accessible.
 
 ## Common erros
 ### Wrong permissions
