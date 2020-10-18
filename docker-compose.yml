@@ -22,7 +22,7 @@ services:
 #      - GID=0
 
   bitwarden:
-    image: mprasil/bitwarden:latest
+    image: bitwardenrs/server
     container_name: bitwarden2
     ports:
       - 8002:80
@@ -39,8 +39,8 @@ services:
       - bitwarden
     volumes:
       - bitwarden:/data/
-     - /etc/timezone:/etc/timezone:ro
-     - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
         # uncomment this if you want your backup to be written to ./backup/ folder"
         # - ./backup:/backup_folder/
     environment:
