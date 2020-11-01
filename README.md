@@ -44,7 +44,7 @@ docker run --rm --volumes-from=bitwarden -v /tmp/myBackup:/myBackup --entrypoint
 | ----- | ----- |
 | DB_FILE | Path to the Bitwarden sqlite3 database *inside* the container |
 | BACKUP_FILE | Path to the desired backup location *inside* the container |
-| BACKUP_FILE_PERMISSIONS | Sets the permissions of the backup file (**CAUTION** [^1] |
+| BACKUP_FILE_PERMISSIONS | Sets the permissions of the backup file (**CAUTION** [^1]) |
 | CRON_TIME | Cronjob format "Minute Hour Day_of_month Month_of_year Day_of_week Year" |
 | TIMESTAMP | Set to `true` to append timestamp to the `BACKUP_FILE` |
 | UID | User ID to run the cron job with |
