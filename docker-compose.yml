@@ -18,12 +18,12 @@ services:
 #      - BACKUP_FILE=/backup_folder/db_backup/backup.sqlite3
 #      - CRON_TIME=*/1 * * * *
 #      - TIMESTAMP=false
-#      - UID=0
-#      - GID=0
-
+#      - UID=1002
+#      - GID=1002
+#
   bitwarden:
     image: bitwardenrs/server
-    container_name: bitwarden2
+    container_name: bitwarden
     ports:
       - 8002:80
     volumes:
@@ -52,6 +52,7 @@ services:
       - TIMESTAMP=false
       - UID=0
       - GID=0
+      - BACKUP_FILE_PERMISSIONS=700
 
 volumes:
   bitwarden:
