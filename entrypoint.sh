@@ -17,7 +17,7 @@ fi
 
 # For compatibility reasons
 if [ "$1" = "/backup.sh" ]; then
-  >&2 echo "Using /backup.sh is deprecated and will be removed in future versions! Please use \`manual\` as arugment instead"
+  >&2 echo "Using /backup.sh is deprecated and will be removed in future versions! Please use \`manual\` as argument instead"
   $BACKUP_CMD
 fi
 
