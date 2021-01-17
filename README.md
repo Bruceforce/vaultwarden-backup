@@ -26,7 +26,7 @@ docker run -d --restart=always --name bitwarden_backup --volumes-from=bitwarden 
 You can use the crontab of your host to schedule the backup and the container will only be running during the backup process.
 
 ```sh
-docker run --rm --volumes-from=bitwarden --entrypoint sqlite3 bruceforce/bw_backup $DB_FILE ".backup $BACKUP_FILE"
+docker run --rm --volumes-from=bitwarden bruceforce/bw_backup manual
 ```
 
 Keep in mind that the above command will be executed inside the container. So
@@ -36,7 +36,7 @@ If you want the backed up file to be stored outside the container you have to mo
 a directory by adding `-v <PATH_ON_YOUR_HOST>:<PATH_INSIDE_CONTAINER>`. The complete command could look like this
 
 ```sh
-docker run --rm --volumes-from=bitwarden -v /tmp/myBackup:/myBackup --entrypoint sqlite3 bruceforce/bw_backup /data/db.sqlite3 ".backup /myBackup/backup.sqlite3"
+docker run --rm --volumes-from=bitwarden -e UID=0 -e BACKUP_FILE=/myBackup/backup.sqlite3 -e TIMESTAMP=true -v /tmp/myBackup:/myBackup bruceforce/bw_backup manual
 ```
 
 ## Environment variables
