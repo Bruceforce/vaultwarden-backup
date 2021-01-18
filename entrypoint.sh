@@ -24,6 +24,7 @@ fi
 # Just run the backup script
 if [ "$1" = "manual" ]; then
   $BACKUP_CMD
+  exit 0
 fi
 
 # Initialize cron
