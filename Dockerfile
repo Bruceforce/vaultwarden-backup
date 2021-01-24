@@ -1,4 +1,5 @@
-FROM alpine:latest
+ARG ARCH=
+FROM ${ARCH}alpine:latest
 
 RUN addgroup -S app && adduser -S -G app app
 
