@@ -2,7 +2,13 @@
 Docker Containers for [bitwarden_rs](https://github.com/dani-garcia/bitwarden_rs) Backup.
 
 ## Usage
-The default tag `latest` should be used for a x86-64 system. If you try to run the container on a raspberry pi 3 you should use the tag `rpi3`. Also make sure that your **bitwarden_rs container is named `bitwarden`** otherwise you have to replace the container name in the `--volumes-from` section of the `docker run` call.
+Since version v0.0.7 you can always use the `latest` tag, since the image is build with
+multi-arch support. Of course you can always use the version tags `vx.y.z` to stick
+to a specific version. Note however that there will be no security updates for the
+alpine base image if you stick to a version.
+
+Make sure that your **bitwarden_rs container is named `bitwarden`** otherwise 
+you have to replace the container name in the `--volumes-from` section of the `docker run` call.
 
 ### Automatic Backups 
 A cron daemon is running inside the container and the container keeps running in background.
