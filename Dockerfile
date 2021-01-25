@@ -1,11 +1,13 @@
-FROM alpine:latest
+ARG ARCH=
+FROM ${ARCH}alpine:latest
 
 RUN addgroup -S app && adduser -S -G app app
 
 RUN apk add --no-cache \
     sqlite \
     busybox-suid \
-    su-exec
+    su-exec \
+    tzdata
 
 ENV DB_FILE /data/db.sqlite3
 ENV BACKUP_FILE /data/db_backup/backup.sqlite3

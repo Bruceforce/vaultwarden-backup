@@ -40,20 +40,22 @@ docker run --rm --volumes-from=bitwarden -e UID=0 -e BACKUP_FILE=/myBackup/backu
 ```
 
 ## Environment variables
-| ENV | Description |
-| ----- | ----- |
-| DB_FILE | Path to the Bitwarden sqlite3 database *inside* the container |
-| BACKUP_FILE | Path to the desired backup location *inside* the container |
-| BACKUP_FILE_PERMISSIONS | Sets the permissions of the backup file (**CAUTION** [^1]) |
-| CRON_TIME | Cronjob format "Minute Hour Day_of_month Month_of_year Day_of_week Year" |
-| TIMESTAMP | Set to `true` to append timestamp to the `BACKUP_FILE` |
-| UID | User ID to run the cron job with |
-| GID | Group ID to run the cron job with |
-| LOGFILE | Path to the logfile *inside* the container |
-| CRONFILE | Path to the cron file *inside* the container |
-| DELETE_AFTER | Delete old backups after X many days |
+| ENV                     | Description                                                              |
+| ----------------------- | ------------------------------------------------------------------------ |
+| DB_FILE                 | Path to the Bitwarden sqlite3 database *inside* the container            |
+| BACKUP_FILE             | Path to the desired backup location *inside* the container               |
+| BACKUP_FILE_PERMISSIONS | Sets the permissions of the backup file (**CAUTION** [^1])               |
+| CRON_TIME               | Cronjob format "Minute Hour Day_of_month Month_of_year Day_of_week Year" |
+| TIMESTAMP               | Set to `true` to append timestamp to the `BACKUP_FILE`                   |
+| UID                     | User ID to run the cron job with                                         |
+| GID                     | Group ID to run the cron job with                                        |
+| LOGFILE                 | Path to the logfile *inside* the container                               |
+| CRONFILE                | Path to the cron file *inside* the container                             |
+| DELETE_AFTER            | Delete old backups after X many days                                     |
+| TZ                      | Set the timezone inside the container [^2] 
 
 [^1]: The permissions should at least be 700 since the backup folder itself gets the same permissions and with 600 it would not be accessible.
+[^2]: see <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones> for more information
 
 ## Common erros
 ### Wrong permissions
@@ -64,4 +66,5 @@ via the `UID` and `GID` environment variables like described above.
 
 ### Wrong timestamp
 If you need timestamps in your local timezone you should mount `/etc/timezone:/etc/timezone:ro` and `/etc/localtime:/etc/localtime:ro`
-like it's done in the [docker-compose.yml](docker-compose.yml).
+like it's done in the [docker-compose.yml](docker-compose.yml). An other possible solution is to set the environment variable accordingly (like  `TZ=Europe/Berlin`) 
+(see <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones> for more information).
