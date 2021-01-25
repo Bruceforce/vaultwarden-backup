@@ -1,5 +1,6 @@
 stages:
   - build:docker
+  - push:readme
 
 variables:
   IMAGE_NAME_DOCKERHUB: "index.docker.io/bruceforce/bw_backup"
@@ -61,4 +62,12 @@ build:
     #- docker push "$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG/bw_backup:${CI_COMMIT_TAG:-latest}"
   except:
     - master
+
+push_readme:
+  stage: push:readme
+  image: chko/docker-pushrm
+  variables:
+    - DOCKER_USER: $DOCKERHUB_USER
+    - DOCKER_PASS: $DOCKERHUB_PASSWORD
+    - PUSHRM_TARGET: $IMAGE_NAME_DOCKERHUB
 
