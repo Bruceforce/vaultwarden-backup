@@ -1,9 +1,16 @@
 stages:
-  - build:docker
   - push:readme
+  - build:docker
+
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+    - if: $CI_COMMIT_TAG
 
 variables:
-  IMAGE_NAME_DOCKERHUB: "index.docker.io/bruceforce/bw_backup"
+  DOCKERHUB_REGISTRY: index.docker.io
+  DOCKERHUB_REPO: bw_backup
+  IMAGE_NAME_DOCKERHUB: $DOCKERHUB_REGISTRY/$DOCKERHUB_USER/$DOCKERHUB_REPO"
   # see https://gitlab.com/gitlab-org/gitlab-runner/issues/4501
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: "/certs"
@@ -35,39 +42,58 @@ variables:
     - docker buildx create --use my-context
     - docker info
 
+push_readme:
+  stage: push:readme
+  image: docker:latest
+  services:
+    - docker:dind
+  tags:
+    - shared
+  script:
+    - docker run 
+      -v $(pwd)/README.md:/data/README.md:ro
+      -e DOCKER_USER=$DOCKERHUB_USER 
+      -e DOCKER_PASS=$DOCKERHUB_PASSWORD 
+      -e PUSHRM_FILE=/data/README.md
+      -e PUSHRM_TARGET=docker.io/$DOCKERHUB_USER/$DOCKERHUB_REPO
+      chko/docker-pushrm
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      changes:
+        - README.md
+
 build_master:
   <<: *docker_build
   script:
     - *docker_login
     - *dockerhub_login
     #- docker build --pull -t "$IMAGE_NAME" -t "$IMAGE_NAME_DOCKERHUB:${CI_COMMIT_TAG:-latest}" .
-    - docker buildx build --push --platform linux/arm/v7,linux/arm64/v8,linux/amd64 -t "$CI_REGISTRY_IMAGE:${CI_COMMIT_TAG:-latest}" -t "$IMAGE_NAME_DOCKERHUB:${CI_COMMIT_TAG:-latest}" .
+    - docker buildx build 
+      --push 
+      --platform linux/arm/v7,linux/arm64/v8,linux/amd64 
+      --tag "$CI_REGISTRY_IMAGE:${CI_COMMIT_TAG:-latest}" 
+      --tag "$IMAGE_NAME_DOCKERHUB:${CI_COMMIT_TAG:-latest}" .
     #- docker push "$IMAGE_NAME"
     #- docker push "$IMAGE_NAME_DOCKERHUB:${CI_COMMIT_TAG:-latest}"
-  only:
-    refs:
-      - master
-      - tags
-    changes:
-      - Dockerfile
-      - backup.sh
-      - entrypoint.sh
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master" || $CI_COMMIT_TAG'
+      changes:
+        - Dockerfile
+        - backup.sh
+        - entrypoint.sh
 
 build:
   <<: *docker_build
   script:
     - *docker_login
     #- docker build --pull -t "$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG/bw_backup:${CI_COMMIT_TAG:-latest}" .
-    - docker buildx build --push --platform linux/arm/v7,linux/arm64/v8,linux/amd64 --tag "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME" .
+    - docker buildx build 
+      --push 
+      --platform linux/arm/v7,linux/arm64/v8,linux/amd64 
+      --tag "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME" .
     #- docker push "$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG/bw_backup:${CI_COMMIT_TAG:-latest}"
-  except:
-    - master
-
-push_readme:
-  stage: push:readme
-  image: chko/docker-pushrm
-  variables:
-    - DOCKER_USER: $DOCKERHUB_USER
-    - DOCKER_PASS: $DOCKERHUB_PASSWORD
-    - PUSHRM_TARGET: $IMAGE_NAME_DOCKERHUB
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master" || $CI_COMMIT_TAG'
+      when: never
+    - when: on_success
 
