@@ -70,7 +70,9 @@ Note that sqlite3 creates a lock file in the source directory while running the 
 So source *AND* destination have to be +rw for the user. You can set the user and group ID
 via the `UID` and `GID` environment variables like described above.
 
-### Wrong timestamp
+### Date Time issues / Wrong timestamp
 If you need timestamps in your local timezone you should mount `/etc/timezone:/etc/timezone:ro` and `/etc/localtime:/etc/localtime:ro`
 like it's done in the [docker-compose.yml](docker-compose.yml). An other possible solution is to set the environment variable accordingly (like  `TZ=Europe/Berlin`) 
 (see <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones> for more information).
+
+**Attention** if you are on an ARM based platform please note that [alpine](https://alpinelinux.org/) is used as base image for this project to keep things small. Since alpine 3.13 and above it's possible that you will end up with a container with broken time and date settings (i.e. year 1900). This is a known problem in the alpine project (see [Github issue](https://github.com/alpinelinux/docker-alpine/issues/141) and [solution](https://wiki.alpinelinux.org/wiki/Release_Notes_for_Alpine_3.13.0#time64_requirements)) and there is nothing I can do about it. However in the [alpine wiki](https://wiki.alpinelinux.org/wiki/Release_Notes_for_Alpine_3.13.0#time64_requirements) a solution is being proposed which I also tested tested on my raspberry pi. After following the described process it started working again as expected. If you still experience issues or could for some reason not apply the aforementioned fixes please feel free to open an issue.
