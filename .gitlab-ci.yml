@@ -2,11 +2,6 @@ stages:
   - push:readme
   - build:docker
 
-workflow:
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "push"'
-    - if: $CI_COMMIT_TAG
-
 variables:
   DOCKERHUB_REGISTRY: index.docker.io
   DOCKERHUB_REPO: bw_backup
@@ -58,7 +53,7 @@ push_readme:
       -e PUSHRM_TARGET=docker.io/$DOCKERHUB_USER/$DOCKERHUB_REPO
       chko/docker-pushrm
   rules:
-    - if: '$CI_COMMIT_BRANCH == "master"'
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "master"
       changes:
         - README.md
 
@@ -93,7 +88,4 @@ build:
       --tag "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME" .
     #- docker push "$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG/bw_backup:${CI_COMMIT_TAG:-latest}"
   rules:
-    - if: '$CI_COMMIT_BRANCH == "master" || $CI_COMMIT_TAG'
-      when: never
-    - when: on_success
-
+    - if: $CI_COMMIT_BRANCH != "master"
