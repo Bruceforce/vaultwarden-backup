@@ -15,6 +15,13 @@ then
   install -o $UID -g $GID -m $BACKUP_FILE_PERMISSIONS -d $BACKUP_DIR
 fi
 
+ATTACHMENT_BACKUP_DIR=$(dirname "$ATTACHMENT_BACKUP_FILE")
+if [ ! -d "$ATTACHMENT_BACKUP_DIR" ]
+then
+   echo "$ATTACHMENT_BACKUP_DIR not exists. Creating it with owner $UID:$GID and permissions $BACKUP_FILE_PERMISSIONS."
+   install -o $UID -g $GID -m $BACKUP_FILE_PERMISSIONS -d $ATTACHMENT_BACKUP_DIR 
+fi
+
 # For compatibility reasons
 if [ "$1" = "/backup.sh" ]; then
   >&2 echo "Using /backup.sh is deprecated and will be removed in future versions! Please use \`manual\` as argument instead"
