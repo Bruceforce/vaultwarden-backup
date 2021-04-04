@@ -7,13 +7,23 @@ then
   exit 1;
 fi
 
+
+# Chef if ATTACHMENT_BACKUP_FILE exist. If it's true, attechment are backup. We define var with or without TIMESTAMP
+# In anycase, we define var LOCALVAR_ATTACHMENT_BACKUP_FILE to limit the complexity of code (the number of if-else)
+LOCALVAR_ATTACHMENT_BACKUP_FILE = ""
+if [ -v ATTACHMENT_BACKUP_FILE ]
+then
+  LOCALVAR_ATTACHMENT_BACKUP_FILE = ${ATTACHMENT_BACKUP_FILE}
+fi
+
+
 if [ $TIMESTAMP = true ]
 then
   FINAL_BACKUP_FILE="$(echo "$BACKUP_FILE")_$(date "+%F-%H%M%S")"
-  FINAL_BACKUP_ATTACHMENT="$(echo "$ATTACHMENT_BACKUP_FILE")_$(date "+%F-%H%M%S")"
+  FINAL_BACKUP_ATTACHMENT="$(echo "$LOCALVAR_ATTACHMENT_BACKUP_FILE")_$(date "+%F-%H%M%S")"
 else
   FINAL_BACKUP_FILE=$BACKUP_FILE
-  FINAL_BACKUP_ATTACHMENT=$ATTACHMENT_BACKUP_FILE
+  FINAL_BACKUP_ATTACHMENT=$LOCALVAR_ATTACHMENT_BACKUP_FILE
 fi
 
 
@@ -25,10 +35,18 @@ else
   echo "$(date "+%F %T") - Backup unsuccessfull"
 fi
 
-/bin/tar -cvzf ${FINAL_BACKUP_ATTACHMENT}.tgz ${ATTACHMENT_DIR}
+
+if [ -v ATTACHMENT_BACKUP_FILE ]
+then
+  /bin/tar -cvzf ${FINAL_BACKUP_ATTACHMENT}.tgz ${ATTACHMENT_DIR}
+fi
 
 if [ ! -z $DELETE_AFTER ] && [ $DELETE_AFTER -gt 0 ]
 then
   find $(dirname "$BACKUP_FILE") -name "$(basename "$BACKUP_FILE")*" -type f -mtime +$DELETE_AFTER -exec rm -f {} \; -exec echo "Deleted {} after $DELETE_AFTER days" \;
-  find $(dirname "$ATTACHMENT_BACKUP_FILE") -name "$(basename "$ATTACHMENT_BACKUP_FILE")*" -type f -mtime +$DELETE_AFTER -exec rm -f {} \; -exec echo "Deleted {} after $DELETE_AFTER days" \;
+
+  if [ -v ATTACHMENT_BACKUP_FILE ]
+  then
+    find $(dirname "$FINAL_BACKUP_ATTACHMENT") -name "$(basename "$FINAL_BACKUP_ATTACHMENT")*" -type f -mtime +$DELETE_AFTER -exec rm -f {} \; -exec echo "Deleted {} after $DELETE_AFTER days" \;
+  fi
 fi

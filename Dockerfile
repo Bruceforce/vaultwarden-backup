@@ -11,7 +11,7 @@ RUN apk add --no-cache \
 
 ENV DB_FILE /data/db.sqlite3
 ENV BACKUP_FILE /data/db_backup/backup.sqlite3
-ENV ATTACHMENT_BACKUP_FILE=/data/attachments_backup/attachments
+#ENV ATTACHMENT_BACKUP_FILE=/data/attachments_backup/attachments
 ENV ATTACHMENT_DIR=/data/attachments
 ENV BACKUP_FILE_PERMISSIONS 700
 ENV CRON_TIME "0 5 * * *"
