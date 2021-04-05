@@ -18,6 +18,11 @@ Start backup container with default settings (automatic backup at 5 am)
 docker run -d --restart=always --name bitwarden_backup --volumes-from=bitwarden bruceforce/bw_backup
 ```
 
+Example for backup including attachment folder (see [Environment variables section](#environment-variables) for more information)
+```sh
+docker run -d --restart=always --name bitwarden_backup --volumes-from=bitwarden -e ATTACHMENT_BACKUP_FILE=/data/attachments_backup/attachments bruceforce/bw_backup
+```
+
 Example for hourly backups
 ```sh
 docker run -d --restart=always --name bitwarden_backup --volumes-from=bitwarden -e CRON_TIME="0 * * * *" bruceforce/bw_backup
