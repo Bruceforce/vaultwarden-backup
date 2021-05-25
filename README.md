@@ -15,34 +15,34 @@ A cron daemon is running inside the container and the container keeps running in
 
 Start backup container with default settings (automatic backup at 5 am)
 ```sh
-docker run -d --restart=always --name bitwarden_backup --volumes-from=bitwarden jmqm/bw_backup
+docker run -d --restart=always --name bitwarden_backup --volumes-from=bitwarden jmqm/bitwarden_rs-backup
 ```
 
 Example for backup including attachment folder (see [Environment variables section](#environment-variables) for more information)
 ```sh
-docker run -d --restart=always --name bitwarden_backup --volumes-from=bitwarden -e ATTACHMENT_BACKUP_FILE=/data/attachments_backup/attachments jmqm/bw_backup
+docker run -d --restart=always --name bitwarden_backup --volumes-from=bitwarden -e ATTACHMENT_BACKUP_FILE=/data/attachments_backup/attachments jmqm/bitwarden_rs-backup
 ```
 
 Example for backup including send folder (see [Environment variables section](#environment-variables) for more information)
 ```sh
-docker run -d --restart=always --name bitwarden_backup --volumes-from=bitwarden -e SEND_BACKUP_FILE=/data/sends_backup/sends jmqm/bw_backup
+docker run -d --restart=always --name bitwarden_backup --volumes-from=bitwarden -e SEND_BACKUP_FILE=/data/sends_backup/sends jmqm/bitwarden_rs-backup
 ```
 
 Example for hourly backups
 ```sh
-docker run -d --restart=always --name bitwarden_backup --volumes-from=bitwarden -e CRON_TIME="0 * * * *" jmqm/bw_backup
+docker run -d --restart=always --name bitwarden_backup --volumes-from=bitwarden -e CRON_TIME="0 * * * *" jmqm/bitwarden_rs-backup
 ```
 
 Example for backups that delete after 30 days
 ```sh
-docker run -d --restart=always --name bitwarden_backup --volumes-from=bitwarden -e DELETE_AFTER=30 jmqm/bw_backup
+docker run -d --restart=always --name bitwarden_backup --volumes-from=bitwarden -e DELETE_AFTER=30 jmqm/bitwarden_rs-backup
 ```
 
 ### Manual Backups
 You can use the crontab of your host to schedule the backup and the container will only be running during the backup process.
 
 ```sh
-docker run --rm --volumes-from=bitwarden jmqm/bw_backup manual
+docker run --rm --volumes-from=bitwarden jmqm/bitwarden_rs-backup manual
 ```
 
 Keep in mind that the above command will be executed inside the container. So
@@ -52,7 +52,7 @@ If you want the backed up file to be stored outside the container you have to mo
 a directory by adding `-v <PATH_ON_YOUR_HOST>:<PATH_INSIDE_CONTAINER>`. The complete command could look like this
 
 ```sh
-docker run --rm --volumes-from=bitwarden -e UID=0 -e BACKUP_FILE=/myBackup/backup.sqlite3 -e TIMESTAMP=true -v /tmp/myBackup:/myBackup jmqm/bw_backup manual
+docker run --rm --volumes-from=bitwarden -e UID=0 -e BACKUP_FILE=/myBackup/backup.sqlite3 -e TIMESTAMP=true -v /tmp/myBackup:/myBackup jmqm/bitwarden_rs-backup manual
 ```
 
 ## Environment variables
