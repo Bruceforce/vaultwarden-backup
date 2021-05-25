@@ -23,6 +23,11 @@ Example for backup including attachment folder (see [Environment variables secti
 docker run -d --restart=always --name bitwarden_backup --volumes-from=bitwarden -e ATTACHMENT_BACKUP_FILE=/data/attachments_backup/attachments bruceforce/bw_backup
 ```
 
+Example for backup including send folder (see [Environment variables section](#environment-variables) for more information)
+```sh
+docker run -d --restart=always --name bitwarden_backup --volumes-from=bitwarden -e SEND_BACKUP_FILE=/data/sends_backup/sends bruceforce/bw_backup
+```
+
 Example for hourly backups
 ```sh
 docker run -d --restart=always --name bitwarden_backup --volumes-from=bitwarden -e CRON_TIME="0 * * * *" bruceforce/bw_backup
@@ -65,7 +70,9 @@ docker run --rm --volumes-from=bitwarden -e UID=0 -e BACKUP_FILE=/myBackup/backu
 | DELETE_AFTER            | Delete old backups after X many days                                                   |
 | TZ                      | Set the timezone inside the container [^2]                                             |
 | ATTACHMENT_BACKUP_FILE  | If present, the directory `ATTACHMENT_DIR` are backup in path `ATTACHMENT_BACKUP_FILE` |
-| ATTACHMENT_DIR          | Path to the Bitwarden attachement file *inside* the container                          |
+| ATTACHMENT_DIR          | Path to the Bitwarden attachment folder *inside* the container                         |
+| SEND_BACKUP_FILE        | If present, the directory `SEND_DIR` are backup in path `SEND_BACKUP_FILE`             |
+| SEND_DIR                | Path to the Bitwarden send folder *inside* the container                               |
 
 [^1]: The permissions should at least be 700 since the backup folder itself gets the same permissions and with 600 it would not be accessible.
 [^2]: see <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones> for more information
