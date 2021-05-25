@@ -7,6 +7,7 @@ RUN apk add --no-cache \
     sqlite \
     busybox-suid \
     su-exec \
+    zip \
     tzdata
 
 ENV DB_FILE /data/db.sqlite3
