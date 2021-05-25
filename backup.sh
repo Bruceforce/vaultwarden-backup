@@ -5,7 +5,8 @@ BACKUP_FOLDER=/backups/$(date "+%F_%H.%M.%S")
 
 # Create variables for the files and folders to be zipped.
 BACKUP_DB=/data/db.sqlite3
-BACKUP_RSA=$(echo /data/rsa_key*)
+#BACKUP_RSA=$(echo /data/rsa_key*)
+BACKUP_RSA=/data/rsa_key*
 BACKUP_CONFIG=/data/config.json
 BACKUP_ATTACHMENTS=/data/attachments
 BACKUP_SENDS=/data/sends
