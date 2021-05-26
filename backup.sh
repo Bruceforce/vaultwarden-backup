@@ -11,7 +11,8 @@ BACKUP_ATTACHMENTS=/data/attachments
 BACKUP_SENDS=/data/sends
 
 # Create a zip of the files and directories.
-zip -r -j $BACKUP_ZIP $BACKUP_DB $BACKUP_RSA $BACKUP_CONFIG $BACKUP_ATTACHMENTS $BACKUP_SENDS
+#zip -r $BACKUP_ZIP $BACKUP_DB $BACKUP_RSA $BACKUP_CONFIG $BACKUP_ATTACHMENTS $BACKUP_SENDS
+cd /data && zip -r $BACKUP_ZIP $BACKUP_DB $BACKUP_RSA $BACKUP_CONFIG $BACKUP_ATTACHMENTS $BACKUP_SENDS && cd ..
 
 # Copy files and directories (db, rsa_key, config, attachments and sends).
 #cp /data/db.sqlite3 $BACKUP_DIRECTORY
