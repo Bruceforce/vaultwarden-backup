@@ -15,7 +15,7 @@ services:
   vaultwarden:
 	# Vaultwarden configuration here.
   backup:
-    image: jmqm/vaultwarden-backup
+    image: jmqm/vaultwarden_backup
     container_name: vaultwarden_backup
     volumes:
       - "/vaultwarden_data_directory:/data:ro"
