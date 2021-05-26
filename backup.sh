@@ -1,19 +1,23 @@
 #!/bin/sh
 
-# Create variable for new backup folder.
-BACKUP_FOLDER=/backups/$(date "+%F_%H.%M.%S")
+# Create variable for new backup zip.
+BACKUP_ZIP=/backups/$(date "+%F_%H.%M.%S").zip
+
+# Go inside data folder.
+cd /data
 
 # Create variables for the files and folders to be zipped.
-BACKUP_DB=/data/db.sqlite3
-#BACKUP_RSA=$(echo /data/rsa_key*)
-BACKUP_RSA=/data/rsa_key*
-BACKUP_CONFIG=/data/config.json
-BACKUP_ATTACHMENTS=/data/attachments
-BACKUP_SENDS=/data/sends
+BACKUP_DB=db.sqlite3
+BACKUP_RSA=rsa_key*
+BACKUP_CONFIG=config.json
+BACKUP_ATTACHMENTS=/attachments
+BACKUP_SENDS=/sends
 
 # Create a zip of the files and folders.
-#mkdir $BACKUP_FOLDER
-zip $BACKUP_FOLDER $BACKUP_DB $BACKUP_RSA $BACKUP_CONFIG $BACKUP_ATTACHMENTS $BACKUP_SENDS
+zip -r ../$BACKUP_ZIP $BACKUP_DB $BACKUP_RSA $BACKUP_CONFIG $BACKUP_ATTACHMENTS $BACKUP_SENDS
+
+# Leave data folder.
+cd ..
 
 # Copy files and folders (db, rsa_key, config, attachments and sends).
 #cp /data/db.sqlite3 $BACKUP_FOLDER
