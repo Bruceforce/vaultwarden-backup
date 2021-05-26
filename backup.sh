@@ -10,8 +10,8 @@ cd /data
 BACKUP_DB=db.sqlite3
 BACKUP_RSA=rsa_key*
 BACKUP_CONFIG=config.json
-BACKUP_ATTACHMENTS=/attachments
-BACKUP_SENDS=/sends
+BACKUP_ATTACHMENTS=/attachments/
+BACKUP_SENDS=/sends/
 
 # Create a zip of the files and folders.
 zip -r ../$BACKUP_ZIP $BACKUP_DB $BACKUP_RSA $BACKUP_CONFIG $BACKUP_ATTACHMENTS $BACKUP_SENDS
