@@ -48,6 +48,6 @@ then
 
   if [ ! -z $ATTACHMENT_BACKUP_FILE ]
   then
-    find $(dirname "$FINAL_BACKUP_ATTACHMENT") -name "$(basename "$FINAL_BACKUP_ATTACHMENT")*" -type f -mtime +$DELETE_AFTER -exec rm -f {} \; -exec echo "Deleted {} after $DELETE_AFTER days" \;
+    find $(dirname "$ATTACHMENT_BACKUP_FILE") -name "$(basename "$ATTACHMENT_BACKUP_FILE")*" -type f -mtime +$DELETE_AFTER -exec rm -f {} \; -exec echo "Deleted {} after $DELETE_AFTER days" \;
   fi
 fi
