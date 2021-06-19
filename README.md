@@ -51,24 +51,25 @@ docker run --rm --volumes-from=bitwarden -e UID=0 -e BACKUP_FILE=/myBackup/backu
 ```
 
 ## Environment variables
-| ENV                     | Description                                                                            |
-| ----------------------- | -------------------------------------------------------------------------------------- |
-| DB_FILE                 | Path to the Bitwarden sqlite3 database *inside* the container                          |
-| BACKUP_FILE             | Path to the desired backup location *inside* the container                             |
-| BACKUP_FILE_PERMISSIONS | Sets the permissions of the backup file (**CAUTION** [^1])                             |
-| CRON_TIME               | Cronjob format "Minute Hour Day_of_month Month_of_year Day_of_week Year"               |
-| TIMESTAMP               | Set to `true` to append timestamp to the `BACKUP_FILE`                                 |
-| UID                     | User ID to run the cron job with                                                       |
-| GID                     | Group ID to run the cron job with                                                      |
-| LOGFILE                 | Path to the logfile *inside* the container                                             |
-| CRONFILE                | Path to the cron file *inside* the container                                           |
-| DELETE_AFTER            | Delete old backups after X many days                                                   |
-| TZ                      | Set the timezone inside the container [^2]                                             |
-| ATTACHMENT_BACKUP_FILE  | If present, the directory `ATTACHMENT_DIR` are backup in path `ATTACHMENT_BACKUP_FILE` |
-| ATTACHMENT_DIR          | Path to the Bitwarden attachement file *inside* the container                          |
+| ENV                     | Description                                                                              |
+| ----------------------- | ---------------------------------------------------------------------------------------- |
+| DB_FILE                 | Path to the Bitwarden sqlite3 database *inside* the container                            |
+| BACKUP_FILE             | Path to the desired backup location *inside* the container                               |
+| BACKUP_FILE_PERMISSIONS | Sets the permissions of the backup file (**CAUTION** [^1])                               |
+| CRON_TIME               | Cronjob format "Minute Hour Day_of_month Month_of_year Day_of_week Year"                 |
+| TIMESTAMP               | Set to `true` to append timestamp to the `BACKUP_FILE`                                   |
+| UID                     | User ID to run the cron job with                                                         |
+| GID                     | Group ID to run the cron job with                                                        |
+| LOGFILE                 | Path to the logfile *inside* the container                                               |
+| CRONFILE                | Path to the cron file *inside* the container                                             |
+| DELETE_AFTER            | Delete old backups after X many days                                                     |
+| TZ                      | Set the timezone inside the container [^2]                                               |
+| ATTACHMENT_BACKUP_FILE  | If present, the directory `ATTACHMENT_DIR` will be backed up to `ATTACHMENT_BACKUP_FILE` |
+| ATTACHMENT_DIR          | Path to the Bitwarden attachement folder *inside* the container [^3]                     |
 
 [^1]: The permissions should at least be 700 since the backup folder itself gets the same permissions and with 600 it would not be accessible.
 [^2]: see <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones> for more information
+[^3]: By default this is `/data/attachments`
 
 ## Common erros
 ### Wrong permissions

@@ -3,6 +3,12 @@
 
 #set -x
 
+# Allow start with custom commands
+if [ "$#" -ne 0 ] && command -v "$@" > /dev/null 2>&1; then
+  "$@"
+  exit 0
+fi
+
 BACKUP_CMD="/sbin/su-exec ${UID}:${GID} /app/backup.sh"
 
 echo "Running $(basename "$0") as $(id)"
@@ -12,14 +18,14 @@ BACKUP_DIR=$(dirname "$BACKUP_FILE")
 if [ ! -d "$BACKUP_DIR" ]
 then
   echo "$BACKUP_DIR not exists. Creating it with owner $UID:$GID and permissions $BACKUP_FILE_PERMISSIONS."
-  install -o $UID -g $GID -m $BACKUP_FILE_PERMISSIONS -d $BACKUP_DIR
+  install -o "$UID" -g "$GID" -m "$BACKUP_FILE_PERMISSIONS" -d "$BACKUP_DIR"
 fi
 
 ATTACHMENT_BACKUP_DIR=$(dirname "$ATTACHMENT_BACKUP_FILE")
 if [ ! -d "$ATTACHMENT_BACKUP_DIR" ]
 then
    echo "$ATTACHMENT_BACKUP_DIR not exists. Creating it with owner $UID:$GID and permissions $BACKUP_FILE_PERMISSIONS."
-   install -o $UID -g $GID -m $BACKUP_FILE_PERMISSIONS -d $ATTACHMENT_BACKUP_DIR 
+   install -o "$UID" -g "$GID" -m "$BACKUP_FILE_PERMISSIONS" -d "$ATTACHMENT_BACKUP_DIR"
 fi
 
 # For compatibility reasons
@@ -43,8 +49,7 @@ if [ "$(id -u)" -eq 0 ] && [ "$(grep -c "$BACKUP_CMD" "$CRONFILE")" -eq 0 ]; the
 fi
 
 # Start crond if it's not running
-pgrep crond > /dev/null 2>&1
-if [ $? -ne 0 ]; then
+if ! pgrep crond > /dev/null 2>&1; then
   /usr/sbin/crond -L /app/log/cron.log
 fi
 
