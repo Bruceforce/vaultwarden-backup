@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # vim: tabstop=2 shiftwidth=2 expandtab
 
 #set -x

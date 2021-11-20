@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Check if db file is accessible and exit otherwise
 if [ ! -e "$DB_FILE" ]; then 
