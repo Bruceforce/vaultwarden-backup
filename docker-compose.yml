@@ -58,6 +58,7 @@ services:
       - UID=0
       - GID=0
       - BACKUP_FILE_PERMISSIONS=700
+      - BACKUP_METHOD="local"
 
 volumes:
   bitwarden:
