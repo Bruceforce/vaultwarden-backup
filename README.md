@@ -1,5 +1,12 @@
-# bitwarden_rs Backup
-Docker Containers for [bitwarden_rs](https://github.com/dani-garcia/bitwarden_rs) Backup.
+# Vaultwarden Backup
+
+A simple cron powered backup image for [vaultwarden](https://github.com/dani-garcia/vaultwarden).
+
+:warning: Since Bitwarden_RS has been [renamed](https://github.com/dani-garcia/vaultwarden/discussions/1642#discussion-3344543) to Vaultwarden I also renamend this project to vaultwarden-backup. I will continue pushing the Image also to the old Docker repository for convenience. However you should also switch to the new Docker repository <https://hub.docker.com/r/bruceforce/vaultwarden-backup> if you find some time. To do so just replace the `bruceforce/bw_backup` image by `bruceforce/vaultwarden-backup`.
+
+## Which files are included in the backup?
+
+By default all files that are recommended to backup by the official Vaultwarden wiki <https://github.com/dani-garcia/vaultwarden/wiki/Backing-up-your-vault> are backed up per default.
 
 ## Usage
 Since version v0.0.7 you can always use the `latest` tag, since the image is build with
@@ -7,7 +14,7 @@ multi-arch support. Of course you can always use the version tags `vx.y.z` to st
 to a specific version. Note however that there will be no security updates for the
 alpine base image if you stick to a version.
 
-Make sure that your **bitwarden_rs container is named `bitwarden`** otherwise 
+Make sure that your **vaultwarden container is named `vaultwarden`** otherwise 
 you have to replace the container name in the `--volumes-from` section of the `docker run` call.
 
 ### Automatic Backups 
@@ -15,61 +22,80 @@ A cron daemon is running inside the container and the container keeps running in
 
 Start backup container with default settings (automatic backup at 5 am)
 ```sh
-docker run -d --restart=always --name bitwarden_backup --volumes-from=bitwarden bruceforce/bw_backup
-```
-
-Example for backup including attachment folder (see [Environment variables section](#environment-variables) for more information)
-```sh
-docker run -d --restart=always --name bitwarden_backup --volumes-from=bitwarden -e ATTACHMENT_BACKUP_FILE=/data/attachments_backup/attachments bruceforce/bw_backup
+docker run -d --restart=always --name vaultwarden-backup --volumes-from=vaultwarden bruceforce/vaultwarden-backup
 ```
 
 Example for hourly backups
 ```sh
-docker run -d --restart=always --name bitwarden_backup --volumes-from=bitwarden -e CRON_TIME="0 * * * *" bruceforce/bw_backup
+docker run -d --restart=always --name vaultwarden-backup --volumes-from=vaultwarden -e CRON_TIME="0 * * * *" bruceforce/vaultwarden-backup
 ```
 
 Example for backups that delete after 30 days
 ```sh
-docker run -d --restart=always --name bitwarden_backup --volumes-from=bitwarden -e DELETE_AFTER=30 bruceforce/bw_backup
+docker run -d --restart=always --name vaultwarden --volumes-from=vaultwarden -e TIMESTAMP=true -e DELETE_AFTER=30 bruceforce/vaultwarden-backup
 ```
 
 ### Manual Backups
 You can use the crontab of your host to schedule the backup and the container will only be running during the backup process.
 
 ```sh
-docker run --rm --volumes-from=bitwarden bruceforce/bw_backup manual
+docker run --rm --volumes-from=vaultwarden bruceforce/vaultwarden-backup manual
 ```
 
-Keep in mind that the above command will be executed inside the container. So
-- `$DB_FILE` is the path to the bitwarden database which is normally locatated at `/data/db.sqlite3`
-- `$BACKUP_FILE` can be any place inside the container. Easiest would be to set it to `/data/backup.sqlite3` which will create the backup near the original database file.
 If you want the backed up file to be stored outside the container you have to mount
 a directory by adding `-v <PATH_ON_YOUR_HOST>:<PATH_INSIDE_CONTAINER>`. The complete command could look like this
 
 ```sh
-docker run --rm --volumes-from=bitwarden -e UID=0 -e BACKUP_FILE=/myBackup/backup.sqlite3 -e TIMESTAMP=true -v /tmp/myBackup:/myBackup bruceforce/bw_backup manual
+docker run --rm --volumes-from=vaultwarden -e UID=0 -e BACKUP_DIR=/myBackup -e TIMESTAMP=true -v $(pwd)/myBackup:/myBackup bruceforce/vaultwarden-backup manual
+```
+
+Keep in mind that the commands will be executed *inside* the container. So `$BACKUP_DIR` can be any place inside the container. Easiest would be to set it to `/data/backup` which will create the backup next to the original database file.
+
+### Restore
+
+There is no automated restore process to prevent accidential data loss. So if you need to restore a backup you need to do this manually by following the steps below (assuming your backups are located at `./backup/` and your vaultwarden data ist located at `/var/lib/docker/volumes/vaultwarden/_data/`)
+
+```sh
+# Delete any existing sqlite3 files
+rm /var/lib/docker/volumes/vaultwarden/_data/db.sqlite3*
+
+# Copy the database to the vaultwarden folder
+cp ./backup/db.sqlite3 /var/lib/docker/volumes/vaultwarden/_data/db.sqlite3
+
+# Extract the additional folder from the archive
+tar -xzvf ./backup/data.tar.gz -C /var/lib/docker/volumes/vaultwarden/_data/
 ```
 
 ## Environment variables
-| ENV                     | Description                                                                              |
-| ----------------------- | ---------------------------------------------------------------------------------------- |
-| DB_FILE                 | Path to the Bitwarden sqlite3 database *inside* the container                            |
-| BACKUP_FILE             | Path to the desired backup location *inside* the container                               |
-| BACKUP_FILE_PERMISSIONS | Sets the permissions of the backup file (**CAUTION** [^1])                               |
-| CRON_TIME               | Cronjob format "Minute Hour Day_of_month Month_of_year Day_of_week Year"                 |
-| TIMESTAMP               | Set to `true` to append timestamp to the `BACKUP_FILE`                                   |
-| UID                     | User ID to run the cron job with                                                         |
-| GID                     | Group ID to run the cron job with                                                        |
-| LOGFILE                 | Path to the logfile *inside* the container                                               |
-| CRONFILE                | Path to the cron file *inside* the container                                             |
-| DELETE_AFTER            | Delete old backups after X many days                                                     |
-| TZ                      | Set the timezone inside the container [^2]                                               |
-| ATTACHMENT_BACKUP_FILE  | If present, the directory `ATTACHMENT_DIR` will be backed up to `ATTACHMENT_BACKUP_FILE` |
-| ATTACHMENT_DIR          | Path to the Bitwarden attachement folder *inside* the container [^3]                     |
+| ENV                         | Description                                                                   |
+| --------------------------- | ----------------------------------------------------------------------------- |
+| BACKUP_ADD_DATABASE [^3]    | Set to `true` to include the database itself in the backup                    |
+| BACKUP_ADD_ATTACHMENTS [^3] | Set to `true` to include the attachments folder in the backup                 |
+| BACKUP_ADD_CONFIG_JSON [^3] | Set to `true` to include `config.json` in the backup                          |
+| BACKUP_ADD_ICON_CACHE [^3]  | Set to `true` to include the icon cache folder in the backup                  |
+| BACKUP_ADD_RSA_KEY [^3]     | Set to `true` to include the RSA keys in the backup                           |
+| BACKUP_ADD_SENDS [^3]       | Set to `true` to include the sends folder in the backup                       |
+| BACKUP_DIR_PERMISSIONS      | Sets the permissions of the backup folder (**CAUTION** [^1])                  |
+| CRONFILE                    | Path to the cron file *inside* the container                                  |
+| CRON_TIME                   | Cronjob format "Minute Hour Day_of_month Month_of_year Day_of_week Year"      |
+| DELETE_AFTER                | Delete old backups after X many days. Set to 0 to disable                     |
+| TIMESTAMP                   | Set to `true` to append timestamp to the backup file                          |
+| GID                         | Group ID to run the cron job with                                             |
+| LOG_LEVEL                   | DEBUG, INFO, WARNING, ERROR, CRITICAL are supported                           |
+| LOGFILE                     | Path to the logfile *inside* the container                                    |
+| TZ                          | Set the timezone inside the container [^2]                                    |
+| UID                         | User ID to run the cron job with                                              |
+| VW_DATA_FOLDER [^4]         | Set the location of the vaultwarden data folder *inside* the container        |
+| VW_DATABASE_URL [^4]        | Set the location of the vaultwarden database file *inside* the container      |
+| VW_ATTACHMENTS_FOLDER [^4]  | Set the location of the vaultwarden attachments folder *inside* the container |
+| VW_ICON_CACHE_FOLDER [^4]   | Set the location of the vaultwarden icon cache folder *inside* the container  |
+
+For default values see [src/opt/scripts/set-env.sh](src/opt/scripts/set-env.sh)
 
 [^1]: The permissions should at least be 700 since the backup folder itself gets the same permissions and with 600 it would not be accessible.
 [^2]: see <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones> for more information
-[^3]: By default this is `/data/attachments`
+[^3]: See <https://github.com/dani-garcia/vaultwarden/wiki/Backing-up-your-vault> for more details
+[^4]: See <https://github.com/dani-garcia/vaultwarden/wiki/Changing-persistent-data-location> for more details
 
 ## Common erros
 ### Wrong permissions
