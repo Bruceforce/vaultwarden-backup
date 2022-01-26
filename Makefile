@@ -10,7 +10,7 @@ test-release:
 	docker run --rm -v $(CURRENT_DIR):/app --workdir /app --env-file .env node:lts-alpine sh -c '\
 		apk add git && \
 		npm install -g semantic-release conventional-changelog-conventionalcommits @semantic-release/changelog @semantic-release/git @semantic-release/gitlab && \
-		semantic-release -d --dry-run --no-ci -r https://gitlab.com/1O/bitwarden_rs-backup'
+		semantic-release -d --dry-run --no-ci -r https://gitlab.com/1O/vaultwarden-backup'
 test-build:
 	docker network create build-network 2>&1 | true
 	docker run -d --rm --privileged --name dind \
