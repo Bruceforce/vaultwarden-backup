@@ -81,6 +81,7 @@ tar -xzvf ./backup/data.tar.gz -C /var/lib/docker/volumes/vaultwarden/_data/
 | DELETE_AFTER                | Delete old backups after X many days. Set to 0 to disable                     |
 | TIMESTAMP                   | Set to `true` to append timestamp to the backup file                          |
 | GID                         | Group ID to run the cron job with                                             |
+| HEALTHCHECK_URL             | Set a healthcheck url like <https://hc-ping.com/xyz>                          |
 | LOG_LEVEL                   | DEBUG, INFO, WARNING, ERROR, CRITICAL are supported                           |
 | LOGFILE                     | Path to the logfile *inside* the container                                    |
 | TZ                          | Set the timezone inside the container [^2]                                    |
