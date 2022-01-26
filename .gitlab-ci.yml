@@ -97,7 +97,7 @@ release:
   image: node:lts-alpine
   before_script:
     - apk add git
-    - npm install -g semantic-release @semantic-release/gitlab
+    - npm install -g semantic-release @semantic-release/changelog @semantic-release/git @semantic-release/gitlab
   script:
     - semantic-release
   rules:
