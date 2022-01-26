@@ -1,6 +1,7 @@
 stages:
   - push:readme
   - build:docker
+  - release
 
 variables:
   DOCKERHUB_REGISTRY: index.docker.io
