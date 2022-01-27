@@ -75,6 +75,7 @@ tar -xzvf ./backup/data.tar.gz -C /var/lib/docker/volumes/vaultwarden/_data/
 | BACKUP_ADD_ICON_CACHE [^3]  | Set to `true` to include the icon cache folder in the backup                        |
 | BACKUP_ADD_RSA_KEY [^3]     | Set to `true` to include the RSA keys in the backup                                 |
 | BACKUP_ADD_SENDS [^3]       | Set to `true` to include the sends folder in the backup                             |
+| BACKUP_DIR                  | Seths the path of the backup folder *inside* the container                          |
 | BACKUP_DIR_PERMISSIONS      | Sets the permissions of the backup folder (**CAUTION** [^1]). Set to -1 to disable. |
 | CRONFILE                    | Path to the cron file *inside* the container                                        |
 | CRON_TIME                   | Cronjob format "Minute Hour Day_of_month Month_of_year Day_of_week Year"            |
