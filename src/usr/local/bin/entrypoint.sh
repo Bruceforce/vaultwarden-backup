@@ -18,9 +18,17 @@ if [ "$#" -ne 0 ] && command -v "$@" > /dev/null 2>&1; then
   exit 0
 fi
 
-BACKUP_CMD="/sbin/su-exec ${UID}:${GID} /app/backup.sh"
+if [ "$(id -u)" -eq 0 ]; then
+  # If running as root ensure to use su-exec for the backup
+  BACKUP_CMD="/sbin/su-exec ${UID}:${GID} /app/backup.sh"
+else
+  BACKUP_CMD="/app/backup.sh"
+fi
 
 debug "Running $(basename "$0") as $(id)"
+debug "BACKUP_CMD=$BACKUP_CMD"
+
+### Functions ###
 
 check_deprecations() {
   # Warning for deprecated settings
@@ -117,9 +125,9 @@ init_folders() {
 
 # Initialize cron
 init_cron() {
-  if [ "$(id -u)" -eq 0 ] && [ "$(grep -c "$BACKUP_CMD" "$CRONFILE")" -eq 0 ]; then
-    info "Initalizing..."
-    debug "Writing backup command \"$BACKUP_CMD\" to cron."
+  if [ "$(grep -c "$BACKUP_CMD" "$CRONFILE")" -eq 0 ]; then
+    info "Initalizing $CRONFILE"
+    debug "Writing backup command \"$BACKUP_CMD\" to $CRONFILE."
     echo "$CRON_TIME $BACKUP_CMD >> $LOGFILE_APP 2>&1" | crontab -
   fi
 
@@ -129,24 +137,28 @@ init_cron() {
   fi
 }
 
-# Restart script as user "app:app"
+### Main ###
+
+# Init and then restart script as user "app:app"
 if [ "$(id -u)" -eq 0 ]; then
   check_deprecations
   init_folders
-  init_cron
-  debug "Restarting $(basename "$0") as app:app"
-  exec su-exec app:app "$0" "$@"
-fi
-
-# Just run the backup script
-if [ "$1" = "manual" ]; then
-  $BACKUP_CMD
-  exit 0
+  if [ "$1" != "manual" ]; then init_cron; fi
+  debug "Restarting $(basename "$0") as $UID:$GID"
+  exec su-exec "$UID:$GID" "$0" "$@"
 fi
 
 info "Log level set to $LOG_LEVEL" > "$LOGFILE_APP"
 info "Container started" >> "$LOGFILE_APP"
 debug "Environment Variables:\n$(env)" >> "$LOGFILE_APP"
+
+# Just run the backup script
+if [ "$1" = "manual" ]; then
+  log "Running in manual mode." >> "$LOGFILE_APP"
+  $BACKUP_CMD
+  cat "$LOGFILE_APP"
+  exit 0
+fi
 
 # Include cron.log in debug mode
 if [ "$LOG_LEVEL_NUMBER" -eq 7  ]; then
