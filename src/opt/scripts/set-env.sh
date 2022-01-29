@@ -9,7 +9,10 @@ export TIMESTAMP="${TIMESTAMP:-false}"
 export UID="${UID:-100}"
 export GID="${GID:-100}"
 export CRONFILE="${CRONFILE:-/etc/crontabs/root}"
-export LOGFILE="${LOGFILE:-/app/log/backup.log}"
+export LOG_DIR="${LOG_DIR:-/app/log}"
+export LOG_DIR_PERMISSIONS="${LOG_DIR_PERMISSIONS:-777}"
+export LOGFILE_APP="${LOGFILE_APP:-$LOG_DIR/app.log}"
+export LOGFILE_CRON="${LOGFILE_CRON:-$LOG_DIR/cron.log}"
 export DELETE_AFTER="${DELETE_AFTER:-0}"
 
 # Additional backup files
