@@ -18,15 +18,10 @@ if [ "$#" -ne 0 ] && command -v "$@" > /dev/null 2>&1; then
   exit 0
 fi
 
-if [ "$(id -u)" -eq 0 ]; then
-  # If running as root ensure to use su-exec for the backup
-  BACKUP_CMD="/sbin/su-exec ${UID}:${GID} /app/backup.sh"
-else
-  BACKUP_CMD="/app/backup.sh"
-fi
+BACKUP_CMD="/sbin/su-exec ${UID}:${GID} /app/backup.sh"
+debug "\$BACKUP_CMD=$BACKUP_CMD"
 
 debug "Running $(basename "$0") as $(id)"
-debug "BACKUP_CMD=$BACKUP_CMD"
 
 ### Functions ###
 
@@ -90,16 +85,16 @@ check_deprecations() {
 # Permissions
 adjust_permissions() {
   if [ "$BACKUP_DIR_PERMISSIONS" -ne -1 ]; then
-    info "Adjusting permissions for $BACKUP_DIR: Setting owner $UID:$GID and permissions $BACKUP_DIR_PERMISSIONS."
-    chown "$UID:$GID" "$BACKUP_DIR"
+    debug "Adjusting permissions for $BACKUP_DIR: Setting owner $UID:$GID and permissions $BACKUP_DIR_PERMISSIONS."
+    chown -R "$UID:$GID" "$BACKUP_DIR"
     chmod -R "$BACKUP_DIR_PERMISSIONS" "$BACKUP_DIR"
   else
     info "\$BACKUP_DIR_PERMISSIONS set to -1. Skipping adjustment of permissions."
   fi
 
   if [ "$LOG_DIR_PERMISSIONS" -ne -1 ]; then
-    info "Adjusting permissions for $LOG_DIR: Setting owner $UID:$GID and permissions $LOG_DIR_PERMISSIONS."
-    chown "$UID:$GID" "$LOG_DIR"
+    debug "Adjusting permissions for $LOG_DIR: Setting owner $UID:$GID and permissions $LOG_DIR_PERMISSIONS."
+    chown -R "$UID:$GID" "$LOG_DIR"
     chmod -R "$LOG_DIR_PERMISSIONS" "$LOG_DIR"
   else
     info "\$LOG_DIR_PERMISSIONS set to -1. Skipping adjustment of permissions."
@@ -108,19 +103,15 @@ adjust_permissions() {
 
 # Initialization
 init_folders() {
-  if [ ! -d "$BACKUP_DIR" ]
-  then
+  if [ ! -d "$BACKUP_DIR" ]; then
     info "Creating $BACKUP_DIR."
     install -o "$UID" -g "$GID" -m "$BACKUP_DIR_PERMISSIONS" -d "$BACKUP_DIR"
   fi
 
-  if [ ! -d "$LOG_DIR" ]
-  then
+  if [ ! -d "$LOG_DIR" ]; then
     info "Creating $LOG_DIR."
     install -o "$UID" -g "$GID" -m "$LOG_DIR_PERMISSIONS" -d "$LOG_DIR"
   fi
-
-  adjust_permissions
 }
 
 # Initialize cron
@@ -137,28 +128,37 @@ init_cron() {
   fi
 }
 
-### Main ###
+# Initialize logfiles
+init_log() {
+  info "Log level set to $LOG_LEVEL" > "$LOGFILE_APP"
+  info "Container started" >> "$LOGFILE_APP"
+  debug "Environment Variables:\n$(env)" >> "$LOGFILE_APP"
+}
 
-# Init and then restart script as user "app:app"
-if [ "$(id -u)" -eq 0 ]; then
-  check_deprecations
-  init_folders
-  if [ "$1" != "manual" ]; then init_cron; fi
-  debug "Restarting $(basename "$0") as $UID:$GID"
-  exec su-exec "$UID:$GID" "$0" "$@"
-fi
-
-info "Log level set to $LOG_LEVEL" > "$LOGFILE_APP"
-info "Container started" >> "$LOGFILE_APP"
-debug "Environment Variables:\n$(env)" >> "$LOGFILE_APP"
-
-# Just run the backup script
-if [ "$1" = "manual" ]; then
-  log "Running in manual mode." >> "$LOGFILE_APP"
+# Run backup in manual mode and exit
+manual_mode() {
+  info "Running in manual mode." >> "$LOGFILE_APP"
   $BACKUP_CMD
   cat "$LOGFILE_APP"
   exit 0
+}
+
+### Main ###
+
+# Init only when run as root because of permissions
+# Also init cron and restart script as user "app:app"
+if [ "$(id -u)" -eq 0 ]; then
+  check_deprecations
+  init_folders
+  init_log
+  adjust_permissions
+  if [ "$1" = "manual" ]; then manual_mode; fi
+  init_cron
+  debug "Restarting $(basename "$0") as app:app"
+  exec su-exec "app:app" "$0" "$@"
 fi
+
+init_log
 
 # Include cron.log in debug mode
 if [ "$LOG_LEVEL_NUMBER" -eq 7  ]; then
