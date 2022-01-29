@@ -48,7 +48,7 @@ backup_additional_data() {
   debug "\$@ is: $*" >> "$LOGFILE_APP"
   loop_ctr=0
   for i in "$@"; do
-    if [ "$loop_ctr" -eq 0 ]; then debug "Clear \$@ on first loop"; set --; fi
+    if [ "$loop_ctr" -eq 0 ]; then debug "Clear \$@ on first loop" >> "$LOGFILE_APP"; set --; fi
 
     # Prevent the "leading slash" warning from tar command
     if [ "$(dirname "$i")" = "$VW_DATA_FOLDER" ]; then
