@@ -1,13 +1,12 @@
 #!/bin/sh
 # vim: tabstop=2 shiftwidth=2 expandtab
 # shellcheck disable=SC3028
+# shellcheck disable=SC1091
 
 #set -x
 
-# shellcheck source=/dev/null
 . /opt/scripts/set-env.sh
 
-# shellcheck source=/dev/null
 . /opt/scripts/logging.sh
 : "${warning_counter:=0}"
 : "${error_counter:=0}"
@@ -124,7 +123,7 @@ init_cron() {
 
   # Start crond if it's not running
   if ! pgrep crond > /dev/null 2>&1; then
-    /usr/sbin/crond -L /app/log/cron.log
+    /usr/sbin/crond -L "$LOGFILE_CRON"
   fi
 }
 
@@ -132,7 +131,7 @@ init_cron() {
 init_log() {
   info "Log level set to $LOG_LEVEL" > "$LOGFILE_APP"
   info "Container started" >> "$LOGFILE_APP"
-  debug "Environment Variables:\n$(env)" >> "$LOGFILE_APP"
+  debug "Environment Variables:\n$(env | sort)" >> "$LOGFILE_APP"
 }
 
 # Run backup in manual mode and exit
@@ -146,7 +145,6 @@ manual_mode() {
 ### Main ###
 
 # Init only when run as root because of permissions
-# Also init cron and restart script as user "app:app"
 if [ "$(id -u)" -eq 0 ]; then
   check_deprecations
   init_folders
@@ -154,11 +152,13 @@ if [ "$(id -u)" -eq 0 ]; then
   adjust_permissions
   if [ "$1" = "manual" ]; then manual_mode; fi
   init_cron
-  debug "Restarting $(basename "$0") as app:app"
-  exec su-exec "app:app" "$0" "$@"
 fi
 
-init_log
+# Restart script as desired user
+if [ "$(id -u)" -ne "$UID" ]; then
+  debug "Restarting $(basename "$0") as $UID:$GID"
+  exec su-exec "$UID:$GID" "$0" "$@"
+fi
 
 # Include cron.log in debug mode
 if [ "$LOG_LEVEL_NUMBER" -eq 7  ]; then
