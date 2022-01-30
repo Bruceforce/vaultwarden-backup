@@ -18,7 +18,6 @@ if [ "$#" -ne 0 ] && command -v "$@" > /dev/null 2>&1; then
 fi
 
 BACKUP_CMD="/sbin/su-exec ${UID}:${GID} /app/backup.sh"
-debug "\$BACKUP_CMD=$BACKUP_CMD"
 
 debug "Running $(basename "$0") as $(id)"
 
@@ -129,6 +128,8 @@ init_cron() {
 
 # Initialize logfiles
 init_log() {
+  su-exec "$UID:$GID" touch "$LOGFILE_CRON"
+  su-exec "$UID:$GID" touch "$LOGFILE_APP"
   info "Log level set to $LOG_LEVEL" > "$LOGFILE_APP"
   info "Container started" >> "$LOGFILE_APP"
   debug "Environment Variables:\n$(env | sort)" >> "$LOGFILE_APP"
