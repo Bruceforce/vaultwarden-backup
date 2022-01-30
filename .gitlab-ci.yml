@@ -76,8 +76,8 @@ build_main:
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || $CI_COMMIT_TAG'
       changes:
         - Dockerfile
-        - backup.sh
-        - entrypoint.sh
+        - src/**/*
+        - .gitlab-ci.yml
 
 build:
   <<: *docker_build
