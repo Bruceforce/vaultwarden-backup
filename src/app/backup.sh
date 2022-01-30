@@ -1,6 +1,7 @@
 #!/bin/sh
 
-# shellcheck source=/dev/null
+# shellcheck disable=SC1091
+
 . /opt/scripts/logging.sh
 : "${warning_counter:=0}"
 : "${error_counter:=0}"
