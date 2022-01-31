@@ -1,3 +1,11 @@
+## [1.0.2](https://gitlab.com/1O/vaultwarden-backup/compare/v1.0.1...v1.0.2) (2022-01-31)
+
+
+### Bug Fixes
+
+* always create logfiles as $UID:$GID ([0034bfb](https://gitlab.com/1O/vaultwarden-backup/commit/0034bfb70107daf3a70039320ac18a57a85d55f6)), closes [#21](https://gitlab.com/1O/vaultwarden-backup/issues/21)
+* Fixed permissions issues with log files ([fec55cc](https://gitlab.com/1O/vaultwarden-backup/commit/fec55cce32790cc23909922f1b1f6ef88dd87b9c)), closes [#21](https://gitlab.com/1O/vaultwarden-backup/issues/21)
+
 ## [1.0.1](https://gitlab.com/1O/vaultwarden-backup/compare/v1.0.0...v1.0.1) (2022-01-29)
 
 
