@@ -4,7 +4,7 @@ stages:
   - release
 
 variables:
-  DOCKERHUB_REGISTRY: index.docker.io
+  DOCKERHUB_REGISTRY: docker.io
   DOCKERHUB_REPO: vaultwarden-backup
   IMAGE_NAME_DOCKERHUB: $DOCKERHUB_REGISTRY/$DOCKERHUB_USER/$DOCKERHUB_REPO
   # see https://gitlab.com/gitlab-org/gitlab-runner/issues/4501
