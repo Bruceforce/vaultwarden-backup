@@ -14,6 +14,7 @@ export LOG_DIR_PERMISSIONS="${LOG_DIR_PERMISSIONS:-777}"
 export LOGFILE_APP="${LOGFILE_APP:-$LOG_DIR/app.log}"
 export LOGFILE_CRON="${LOGFILE_CRON:-$LOG_DIR/cron.log}"
 export DELETE_AFTER="${DELETE_AFTER:-0}"
+export VW_BACKUP_VERSION="0.0.0-dev"
 
 # Additional backup files
 export BACKUP_ADD_DATABASE="${BACKUP_ADD_DATABASE:-true}"

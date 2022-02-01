@@ -130,6 +130,7 @@ init_cron() {
 init_log() {
   su-exec "$UID:$GID" touch "$LOGFILE_CRON"
   su-exec "$UID:$GID" touch "$LOGFILE_APP"
+  info "Running vaultwarden-backup version $VW_BACKUP_VERSION"
   info "Log level set to $LOG_LEVEL" > "$LOGFILE_APP"
   info "Container started" >> "$LOGFILE_APP"
   debug "Environment Variables:\n$(env | sort)" >> "$LOGFILE_APP"
