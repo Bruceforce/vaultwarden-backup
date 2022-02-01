@@ -61,11 +61,11 @@ check_deprecations() {
   fi
 
   # Warning for deprecated settings
-  if [ -n "$LOGFILE_DIR" ]; then
-    warn "\$LOGFILE is deprecated and will be removed in future versions. Please use \$LOGFILE_DIR instead to specify the location of the source attachments folder."
-    if [ -z "$LOGFILE_DIR" ]; then
-      LOGFILE_DIR="$(dirname "$(realpath "$LOGFILE")")";
-      warn "Since \$LOGFILE_DIR is not set defaulting to LOGFILE_DIR=$LOGFILE_DIR"
+  if [ -n "$LOGFILE" ]; then
+    warn "\$LOGFILE is deprecated and will be removed in future versions. Please use \$LOG_DIR instead to specify the location of the logfile folder."
+    if [ -z "$LOG_DIR" ]; then
+      LOG_DIR="$(dirname "$(realpath "$LOGFILE")")";
+      warn "Since \$LOG_DIR is not set defaulting to LOG_DIR=$LOG_DIR"
     fi
   fi
 
