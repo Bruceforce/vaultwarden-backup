@@ -93,7 +93,7 @@ tar -xzvf ./backup/data.tar.gz -C /var/lib/docker/volumes/vaultwarden/_data/
 | HEALTHCHECK_URL             | Set a healthcheck url like <https://hc-ping.com/xyz>                                |
 | LOG_LEVEL                   | DEBUG, INFO, WARNING, ERROR, CRITICAL are supported                                 |
 | LOG_DIR                     | Path to the logfile folder *inside* the container                                   |
-| LOG_DIR_PERMISSIONS         | Sets the permissions of the backup folder. Set to -1 to disable.                    |
+| LOG_DIR_PERMISSIONS         | Sets the permissions of the logfile folder. Set to -1 to disable.                    |
 | TZ                          | Set the timezone inside the container [^2]                                          |
 | UID                         | User ID to run the cron job with                                                    |
 | VW_DATA_FOLDER [^4]         | Set the location of the vaultwarden data folder *inside* the container              |
