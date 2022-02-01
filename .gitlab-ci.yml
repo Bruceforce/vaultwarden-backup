@@ -1,15 +1,18 @@
 stages:
   - push:readme
-  - build:docker
-  - release
+  - build-and-release
 
 variables:
   DOCKERHUB_REGISTRY: docker.io
   DOCKERHUB_REPO: vaultwarden-backup
   IMAGE_NAME_DOCKERHUB: $DOCKERHUB_REGISTRY/$DOCKERHUB_USER/$DOCKERHUB_REPO
-  # see https://gitlab.com/gitlab-org/gitlab-runner/issues/4501
+  # see https://gitlab.com/gitlab-org/gitlab-runner/issues/4501 and https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#docker-in-docker-with-tls-enabled-in-kubernetes
+  # the variables following DOCKER_HOST are needed because we use alpine as build image and not docker. We do this to integrate semantic-release bot
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: "/certs"
+  DOCKER_HOST: tcp://docker:2376
+  DOCKER_TLS_VERIFY: 1
+  DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
   # See https://github.com/docker/buildx/releases
   BUILDX_VERSION: v0.7.1
   BUILDX_ARCH: linux-amd64
@@ -21,15 +24,14 @@ variables:
   docker login -u "$DOCKERHUB_USER" -p "$DOCKERHUB_PASSWORD" $DOCKERHUB_REGISTRY
 
 .docker_build_template: &docker_build
-  stage: build:docker
-  image: docker:latest
+  image: node:lts-alpine
+  stage: build-and-release
   services:
     - name: docker:dind
       command: ["--experimental"]
-  tags:
-    - shared
   before_script:
-    - apk add curl
+    - apk add git zip docker curl
+    - docker info
     - mkdir -p ~/.docker/cli-plugins
     - curl -sSLo ~/.docker/cli-plugins/docker-buildx https://github.com/docker/buildx/releases/download/$BUILDX_VERSION/buildx-$BUILDX_VERSION.$BUILDX_ARCH 
     - chmod +x ~/.docker/cli-plugins/docker-buildx
@@ -37,68 +39,21 @@ variables:
     - docker context create my-context
     - docker buildx create --use my-context
     - docker info
+    - npm install -g semantic-release @semantic-release/gitlab @semantic-release/git @semantic-release/exec @semantic-release/changelog
 
-push_readme:
-  stage: push:readme
-  image: docker:latest
-  services:
-    - docker:dind
-  tags:
-    - shared
-  script:
-    - docker run 
-      -v $(pwd)/README.md:/data/README.md:ro
-      -e DOCKER_USER=$DOCKERHUB_USER 
-      -e DOCKER_PASS=$DOCKERHUB_PASSWORD 
-      -e PUSHRM_FILE=/data/README.md
-      -e PUSHRM_TARGET=docker.io/$DOCKERHUB_USER/$DOCKERHUB_REPO
-      chko/docker-pushrm
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      changes:
-        - README.md
-
-build_main:
+build and release:main:
   <<: *docker_build
-  script:
-    - *docker_login
-    - *dockerhub_login
-    #- docker build --pull -t "$IMAGE_NAME" -t "$IMAGE_NAME_DOCKERHUB:${CI_COMMIT_TAG:-latest}" .
-    - docker buildx build 
-      --push 
-      --platform linux/arm/v7,linux/arm64/v8,linux/amd64 
-      --tag "$CI_REGISTRY_IMAGE:${CI_COMMIT_TAG:-latest}" 
-      --tag "$DOCKERHUB_REGISTRY/$DOCKERHUB_USER/bw_backup:${CI_COMMIT_TAG:-latest}"
-      --tag "$DOCKERHUB_REGISTRY/$DOCKERHUB_USER/vaultwarden-backup:${CI_COMMIT_TAG:-latest}" .
-    #- docker push "$IMAGE_NAME"
-    #- docker push "$IMAGE_NAME_DOCKERHUB:${CI_COMMIT_TAG:-latest}"
-  rules:
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || $CI_COMMIT_TAG'
-      changes:
-        - Dockerfile
-        - src/**/*
-        - .gitlab-ci.yml
-
-build:
-  <<: *docker_build
-  script:
-    - *docker_login
-    #- docker build --pull -t "$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG/bw_backup:${CI_COMMIT_TAG:-latest}" .
-    - docker buildx build 
-      --push 
-      --platform linux/arm/v7,linux/arm64/v8,linux/amd64 
-      --tag "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME" .
-    #- docker push "$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG/bw_backup:${CI_COMMIT_TAG:-latest}"
-  rules:
-    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
-
-release:
-  stage: release
-  image: node:lts-alpine
-  before_script:
-    - apk add git
-    - npm install -g semantic-release @semantic-release/changelog @semantic-release/git @semantic-release/gitlab
   script:
     - semantic-release
+    - .gitlab/build-and-release.sh latest
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+build and release:
+  <<: *docker_build
+  script:
+    - semantic-release
+    - .gitlab/prepare-release.sh 0.0.0-$CI_COMMIT_REF_SLUG
+    - .gitlab/build-and-release.sh $CI_COMMIT_REF_SLUG
+  rules:
+    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH

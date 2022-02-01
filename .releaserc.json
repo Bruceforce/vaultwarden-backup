@@ -5,6 +5,13 @@
     "plugins": [
         "@semantic-release/commit-analyzer",
         "@semantic-release/release-notes-generator",
+        [
+            "@semantic-release/exec",
+            {
+                "prepareCmd": ".gitlab/prepare-release.sh ${nextRelease.version}",
+                "successCmd": ".gitlab/build-and-release.sh ${nextRelease.version}"
+            }
+        ],
         "@semantic-release/changelog",
         {
             "changelogFile": "CHANGELOG.md"
