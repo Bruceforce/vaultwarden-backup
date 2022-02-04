@@ -1,3 +1,12 @@
+## [1.0.3](https://gitlab.com/1O/vaultwarden-backup/compare/v1.0.2...v1.0.3) (2022-02-04)
+
+
+### Bug Fixes
+
+* deprecation check for $LOGFILE ([11d6cf9](https://gitlab.com/1O/vaultwarden-backup/commit/11d6cf93b0e5b2ea1de84932b84aacd83e40f0c4))
+* Moved deprecation checks to set-env script ([81f6190](https://gitlab.com/1O/vaultwarden-backup/commit/81f619001e1028ea6aad372237c22bb43bded045)), closes [#23](https://gitlab.com/1O/vaultwarden-backup/issues/23)
+* Set LOG_LEVEL first ([d5ee0b1](https://gitlab.com/1O/vaultwarden-backup/commit/d5ee0b1c60ba5d3c8aab57a6abffbf70f968a72d)), closes [#23](https://gitlab.com/1O/vaultwarden-backup/issues/23)
+
 ## [1.0.2](https://gitlab.com/1O/vaultwarden-backup/compare/v1.0.1...v1.0.2) (2022-01-31)
 
 
