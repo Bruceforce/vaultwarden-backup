@@ -1,6 +1,8 @@
 #!/bin/sh
 
 # shellcheck disable=SC1091
+
+export LOG_LEVEL="${LOG_LEVEL:-INFO}"
 . /opt/scripts/logging.sh
 : "${warning_counter:=0}"
 : "${error_counter:=0}"
