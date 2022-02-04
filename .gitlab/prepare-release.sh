@@ -1,5 +1,7 @@
 #!/bin/sh
 
+#set -xe
+
 if [ $# -ne 1 ]; then exit 1; fi
 
 NEW_VERSION=$1

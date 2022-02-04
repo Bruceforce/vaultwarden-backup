@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -xe
+#set -xe
 
 ### Functions
 

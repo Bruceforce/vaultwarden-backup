@@ -5,8 +5,6 @@ warning_counter=0
 error_counter=0
 
 # Set LOG_LEVEL
-# Default level is INFO
-LOG_LEVEL_NUMBER=6
 if [ "$LOG_LEVEL" = "DEBUG" ]; then LOG_LEVEL_NUMBER=7; fi
 if [ "$LOG_LEVEL" = "INFO" ]; then LOG_LEVEL_NUMBER=6; fi
 if [ "$LOG_LEVEL" = "WARN" ]; then LOG_LEVEL_NUMBER=4; fi

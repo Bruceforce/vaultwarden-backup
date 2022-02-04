@@ -23,63 +23,6 @@ debug "Running $(basename "$0") as $(id)"
 
 ### Functions ###
 
-check_deprecations() {
-  # Warning for deprecated settings
-  if [ -n "$BACKUP_FILE" ]; then
-    warn "\$BACKUP_FILE is deprecated and will be removed in future versions. Please use \$BACKUP_DIR instead to specify the folder of the backup."
-    if [ -z "$BACKUP_DIR" ]; then
-      BACKUP_DIR=$(dirname "$BACKUP_FILE");
-      warn "Since \$BACKUP_DIR is not set defaulting to BACKUP_DIR=$BACKUP_DIR"
-    fi
-  fi
-
-  # Warning for deprecated settings
-  if [ -n "$BACKUP_FILE_PERMISSIONS" ]; then
-    warn "\$BACKUP_FILE_PERMISSIONS is deprecated and will be removed in future versions. Please use \$BACKUP_DIR_PERMISSIONS instead to specify the permissions of the backup folder."
-    if [ -z "$BACKUP_DIR_PERMISSIONS" ]; then
-      BACKUP_DIR_PERMISSIONS="$BACKUP_FILE_PERMISSIONS";
-      warn "Since \$BACKUP_DIR_PERMISSIONS is not set defaulting to BACKUP_DIR_PERMISSIONS=$BACKUP_FILE_PERMISSIONS"
-    fi
-  fi
-
-  # Warning for deprecated settings
-  if [ -n "$DB_FILE" ]; then
-    warn "\$DB_FILE is deprecated and will be removed in future versions. Please use \$VW_DATABASE_URL instead to specify the location of the source database file."
-    if [ -z "$VW_DATABASE_URL" ]; then
-      VW_DATABASE_URL="$DB_FILE";
-      warn "Since \$VW_DATABASE_URL is not set defaulting to VW_DATABASE_URL=$DB_FILE"
-    fi
-  fi
-
-  # Warning for deprecated settings
-  if [ -n "$ATTACHMENT_DIR" ]; then
-    warn "\$ATTACHMENT_DIR is deprecated and will be removed in future versions. Please use \$VW_ATTACHMENTS_FOLDER instead to specify the location of the source attachments folder."
-    if [ -z "$VW_ATTACHMENTS_FOLDER" ]; then
-      VW_ATTACHMENTS_FOLDER="$ATTACHMENT_DIR";
-      warn "Since \$VW_ATTACHMENTS_FOLDER is not set defaulting to VW_ATTACHMENTS_FOLDER=$ATTACHMENT_DIR"
-    fi
-  fi
-
-  # Warning for deprecated settings
-  if [ -n "$LOGFILE" ]; then
-    warn "\$LOGFILE is deprecated and will be removed in future versions. Please use \$LOG_DIR instead to specify the location of the logfile folder."
-    if [ -z "$LOG_DIR" ]; then
-      LOG_DIR="$(dirname "$(realpath "$LOGFILE")")";
-      warn "Since \$LOG_DIR is not set defaulting to LOG_DIR=$LOG_DIR"
-    fi
-  fi
-
-  # Warning for deprecated settings
-  if [ -n "$ATTACHMENT_BACKUP_DIR" ]; then
-    warn "\$ATTACHMENT_BACKUP_DIR is deprecated and will be removed in future versions. Attachment backups are stored in the \$BACKUP_DIR."
-  fi
-
-  # Warning for deprecated settings
-  if [ -n "$ATTACHMENT_BACKUP_FILE" ]; then
-    warn "\$ATTACHMENT_BACKUP_FILE is deprecated and will be removed in future versions. Attachment backups are stored in the \$BACKUP_DIR."
-  fi
-}
-
 # Permissions
 adjust_permissions() {
   if [ "$BACKUP_DIR_PERMISSIONS" -ne -1 ]; then
@@ -148,7 +91,6 @@ manual_mode() {
 
 # Init only when run as root because of permissions
 if [ "$(id -u)" -eq 0 ]; then
-  check_deprecations
   init_folders
   init_log
   adjust_permissions

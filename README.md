@@ -93,7 +93,7 @@ tar -xzvf ./backup/data.tar.gz -C /var/lib/docker/volumes/vaultwarden/_data/
 | HEALTHCHECK_URL             | Set a healthcheck url like <https://hc-ping.com/xyz>                                |
 | LOG_LEVEL                   | DEBUG, INFO, WARNING, ERROR, CRITICAL are supported                                 |
 | LOG_DIR                     | Path to the logfile folder *inside* the container                                   |
-| LOG_DIR_PERMISSIONS         | Sets the permissions of the logfile folder. Set to -1 to disable.                    |
+| LOG_DIR_PERMISSIONS         | Sets the permissions of the logfile folder. Set to -1 to disable.                   |
 | TZ                          | Set the timezone inside the container [^2]                                          |
 | UID                         | User ID to run the cron job with                                                    |
 | VW_DATA_FOLDER [^4]         | Set the location of the vaultwarden data folder *inside* the container              |
@@ -114,6 +114,18 @@ For default values see [src/opt/scripts/set-env.sh](src/opt/scripts/set-env.sh)
 Note that sqlite3 creates a lock file in the source directory while running the backup.
 So source *AND* destination have to be +rw for the user. You can set the user and group ID
 via the `UID` and `GID` environment variables like described above.
+
+### Database is locked
+`Error: database is locked` is most likely caused by choosing a backup location that is *not* on the same filesystem as the vaultwarden database (like a network filesystem).
+
+Vaultwarden, when started with default settings, uses WAL (write-ahed logging). You can verify this by looking for a `db.sqlite3-wal` file in the same folder as your original database file. According to the official SQLite docs WAL will cause issues in network share scenarios (see https://www.sqlite.org/wal.html):
+
+> All processes using a database must be on the same host computer; WAL does not work over a network filesystem.
+
+Basically there are two workarounds for this issue
+
+1. Choose a local target for your backup and then use some other tool like `cp` or `rsync` to copy the backup file to your network filesystem.
+2. Disable WAL in Vaultwarden. You can find a guide here (https://github.com/dani-garcia/vaultwarden/wiki/Running-without-WAL-enabled).
 
 ### Date Time issues / Wrong timestamp
 If you need timestamps in your local timezone you should mount `/etc/timezone:/etc/timezone:ro` and `/etc/localtime:/etc/localtime:ro`
