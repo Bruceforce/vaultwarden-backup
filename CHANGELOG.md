@@ -1,3 +1,10 @@
+## [1.0.4](https://gitlab.com/1O/vaultwarden-backup/compare/v1.0.3...v1.0.4) (2022-04-19)
+
+
+### Bug Fixes
+
+* Make set-env.sh executable ([6f403c8](https://gitlab.com/1O/vaultwarden-backup/commit/6f403c862e2cadf16059a28587d1c75aa08b761b)), closes [#24](https://gitlab.com/1O/vaultwarden-backup/issues/24)
+
 ## [1.0.3](https://gitlab.com/1O/vaultwarden-backup/compare/v1.0.2...v1.0.3) (2022-02-04)
 
 
