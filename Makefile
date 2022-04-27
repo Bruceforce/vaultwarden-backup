@@ -1,7 +1,7 @@
 ### Vars ###
-CURRENT_DIR= $(shell pwd)
-BUILDX_VERSION = v0.7.1
-BUILDX_ARCH = linux-amd64
+CURRENT_DIR=$(shell pwd)
+BUILDX_VERSION=v0.7.1
+BUILDX_ARCH=linux-amd64
 
 ### Targets ###
 test-shellcheck:
