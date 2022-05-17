@@ -3,6 +3,7 @@
 # shellcheck disable=SC1091
 
 . /opt/scripts/logging.sh
+. /opt/scripts/set-env.sh
 : "${warning_counter:=0}"
 : "${error_counter:=0}"
 
@@ -99,6 +100,9 @@ cleanup() {
 
 # Run init
 init
+
+# Dunp env if INFO or DEBUG
+[ "$LOG_LEVEL_NUMBER" -ge 6 ] && (set > "${LOG_DIR}/env.txt")
 
 # Run the backup command for the database file
 if [ "$BACKUP_ADD_DATABASE" = true ]; then
