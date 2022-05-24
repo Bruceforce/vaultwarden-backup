@@ -101,7 +101,7 @@ cleanup() {
 # Run init
 init
 
-# Dunp env if INFO or DEBUG
+# Dump Env if INFO or DEBUG
 [ "$LOG_LEVEL_NUMBER" -ge 6 ] && (set > "${LOG_DIR}/env.txt")
 
 # Run the backup command for the database file
