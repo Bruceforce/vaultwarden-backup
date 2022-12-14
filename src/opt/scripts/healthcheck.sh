@@ -1,14 +1,19 @@
 #!/bin/sh
 
-ERROR_COUNT=`cat /logs/env.txt | grep error | cut -d"'" -f2`
+ERROR_COUNT=`cat $LOG_DIR/env.txt | grep error | cut -d"'" -f2`
 
 if
-[[ -f /data/db.sqlite3 ]] &&
-[[ $ERROR_COUNT = '0' || ! -f /logs/env.txt ]]
+[[ ! -f $VW_DATABASE_URL ]]
 then
-    echo 0
-    exit 0
-else
-    echo 1
+    echo "Database not found!"
     exit 1
 fi
+
+if
+[[ ! $ERROR_COUNT = '0' ]]
+then
+    echo "error_count: $ERROR_COUNT"
+    exit 1
+fi
+
+exit 0
