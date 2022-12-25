@@ -52,6 +52,8 @@ error() {
 
 # Critical log
 critical() {
+  error_counter=$((error_counter + 1))
+  debug "The new error counter is $error_counter."
   if [ "$LOG_LEVEL_NUMBER" -ge 2 ]; then
     log "CRITICAL - $*\nExiting"
   fi
