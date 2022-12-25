@@ -1,8 +1,11 @@
 #!/bin/sh
 
-if [ ! -f /tmp/health ]; then
-    install -d /tmp
-    printf 0 > /tmp/health
+# shellcheck disable=SC1091
+
+. /opt/scripts/set-env.sh
+
+if [ ! -f "$HEALTHCHECK_FILE" ]; then
+    printf 0 > "$HEALTHCHECK_FILE"
 fi
 
-exit "$(cat /tmp/health)"
+exit "$(cat "$HEALTHCHECK_FILE")"

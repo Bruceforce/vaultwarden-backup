@@ -17,6 +17,11 @@ init() {
 
   BACKUP_FILE_DB=$BACKUP_DIR/${TIMESTAMP_PREFIX}db.sqlite3
   BACKUP_FILE_DATA=$BACKUP_DIR/${TIMESTAMP_PREFIX}data.tar.gz
+
+    if [ ! -f "$VW_DATABASE_URL" ]; then
+      printf 1 > "$HEALTHCHECK_FILE"
+      critical "Database $VW_DATABASE_URL not found! Please check if you mounted the vaultwarden volume (in docker-compose or with '--volumes-from=vaultwarden'!)" >> "$LOGFILE_APP"
+  fi
 }
 
 # Backup the database
@@ -70,23 +75,17 @@ backup_additional_data() {
 
 # Performs a healthcheck
 perform_healthcheck() {
-  if [ ! -f "$VW_DATABASE_URL" ]; then
-      error "Database $VW_DATABASE_URL not found! Please check if you mounted the vaultwarden volume (in docker-compose or with '--volumes-from=vaultwarden'!)" >> "$LOGFILE_APP"
-      printf 1 > /tmp/health
-      return 1
-  fi
-
   debug "\$error_counter=$error_counter" >> "$LOGFILE_APP"
 
   if [ "$error_counter" -ne 0 ]; then
     warn "There were $error_counter errors during backup. Not sending health check ping." >> "$LOGFILE_APP"
-    printf 1 > /tmp/health
+    printf 1 > "$HEALTHCHECK_FILE"
     return 1
   fi
 
   # At this point the container is healthy. So we create a health-check file used to determine container health
   # and send a health check ping if the HEALTHCHECK_URL is set.
-  printf 0 > /tmp/health
+  printf 0 > "$HEALTHCHECK_FILE"
   debug "Evaluating \$HEALTHCHECK_URL" >> "$LOGFILE_APP"
   if [ -z "$HEALTHCHECK_URL" ]; then
     debug "Variable \$HEALTHCHECK_URL not set. Skipping health check." >> "$LOGFILE_APP"
