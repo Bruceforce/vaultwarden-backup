@@ -17,11 +17,6 @@ init() {
 
   BACKUP_FILE_DB=$BACKUP_DIR/${TIMESTAMP_PREFIX}db.sqlite3
   BACKUP_FILE_DATA=$BACKUP_DIR/${TIMESTAMP_PREFIX}data.tar.gz
-
-  # Check if db file is accessible and exit otherwise
-  if [ ! -e "$VW_DATABASE_URL" ]; then 
-    critical "Database $VW_DATABASE_URL not found! Please check if you mounted the bitwarden_rs volume with '--volumes-from=vaultwarden'!" >> "$LOGFILE_APP"
-  fi
 }
 
 # Backup the database
@@ -76,7 +71,7 @@ backup_additional_data() {
 # Performs a healthcheck
 perform_healthcheck() {
   if [ ! -f "$VW_DATABASE_URL" ]; then
-      error "Database not found!"
+      error "Database $VW_DATABASE_URL not found! Please check if you mounted the vaultwarden volume (in docker-compose or with '--volumes-from=vaultwarden'!)" >> "$LOGFILE_APP"
       printf 1 > /tmp/health
       return 1
   fi
