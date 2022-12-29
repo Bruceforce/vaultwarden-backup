@@ -51,7 +51,6 @@ adjust_permissions() {
 
   if [ "$HEALTHCHECK_FILE_PERMISSIONS" -ne -1 ]; then
     debug "Adjusting permissions for $HEALTHCHECK_FILE: Setting owner $UID:$GID and permissions $HEALTHCHECK_FILE_PERMISSIONS."
-    touch "$HEALTHCHECK_FILE"
     chown -R "$UID:$GID" "$HEALTHCHECK_FILE"
     chmod -R "$HEALTHCHECK_FILE_PERMISSIONS" "$HEALTHCHECK_FILE"
   else
@@ -66,9 +65,14 @@ init_folders() {
     install -o "$UID" -g "$GID" -m "$BACKUP_DIR_PERMISSIONS" -d "$BACKUP_DIR"
   fi
 
-  if [ ! -f "$APP_DIR" ]; then
+  if [ ! -d "$APP_DIR" ]; then
     info "Creating $APP_DIR."
     install -o "$UID" -g "$GID" -m "$APP_DIR_PERMISSIONS" -d "$APP_DIR"
+  fi
+
+  if [ ! -f "$HEALTHCHECK_FILE" ]; then
+    info "Creating $HEALTHCHECK_FILE."
+    printf 0 > "$HEALTHCHECK_FILE"
   fi
 
   if [ ! -d "$LOG_DIR" ]; then
