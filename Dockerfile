@@ -9,4 +9,6 @@ RUN apk add --no-cache \
 
 COPY src /
 
+HEALTHCHECK CMD [ "healthcheck.sh" ]
+
 ENTRYPOINT ["entrypoint.sh"]

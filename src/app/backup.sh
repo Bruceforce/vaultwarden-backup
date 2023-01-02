@@ -18,9 +18,9 @@ init() {
   BACKUP_FILE_DB=$BACKUP_DIR/${TIMESTAMP_PREFIX}db.sqlite3
   BACKUP_FILE_DATA=$BACKUP_DIR/${TIMESTAMP_PREFIX}data.tar.gz
 
-  # Check if db file is accessible and exit otherwise
-  if [ ! -e "$VW_DATABASE_URL" ]; then 
-    critical "Database $VW_DATABASE_URL not found! Please check if you mounted the bitwarden_rs volume with '--volumes-from=vaultwarden'!" >> "$LOGFILE_APP"
+    if [ ! -f "$VW_DATABASE_URL" ]; then
+      printf 1 > "$HEALTHCHECK_FILE"
+      critical "Database $VW_DATABASE_URL not found! Please check if you mounted the vaultwarden volume (in docker-compose or with '--volumes-from=vaultwarden'!)" >> "$LOGFILE_APP"
   fi
 }
 
@@ -76,16 +76,23 @@ backup_additional_data() {
 # Performs a healthcheck
 perform_healthcheck() {
   debug "\$error_counter=$error_counter" >> "$LOGFILE_APP"
+
   if [ "$error_counter" -ne 0 ]; then
-    warn "There were $error_counter errors during backup. Skipping health check." >> "$LOGFILE_APP"
+    warn "There were $error_counter errors during backup. Not sending health check ping." >> "$LOGFILE_APP"
+    printf 1 > "$HEALTHCHECK_FILE"
     return 1
   fi
+
+  # At this point the container is healthy. So we create a health-check file used to determine container health
+  # and send a health check ping if the HEALTHCHECK_URL is set.
+  printf 0 > "$HEALTHCHECK_FILE"
   debug "Evaluating \$HEALTHCHECK_URL" >> "$LOGFILE_APP"
   if [ -z "$HEALTHCHECK_URL" ]; then
     debug "Variable \$HEALTHCHECK_URL not set. Skipping health check." >> "$LOGFILE_APP"
     return 0
   fi
-  info "Running health check ping" >> "$LOGFILE_APP"
+  
+  info "Sending health check ping." >> "$LOGFILE_APP"
   wget "$HEALTHCHECK_URL" -T 10 -t 5 -q -O /dev/null
 }
 

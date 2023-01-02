@@ -25,6 +25,14 @@ debug "Running $(basename "$0") as $(id)"
 
 # Permissions
 adjust_permissions() {
+  if [ "$APP_DIR_PERMISSIONS" -ne -1 ]; then
+    debug "Adjusting permissions for $APP_DIR: Setting owner $UID:$GID and permissions $APP_DIR_PERMISSIONS."
+    chown -R "$UID:$GID" "$APP_DIR"
+    chmod -R "$APP_DIR_PERMISSIONS" "$APP_DIR"
+  else
+    info "\$APP_DIR_PERMISSIONS set to -1. Skipping adjustment of permissions."
+  fi
+
   if [ "$BACKUP_DIR_PERMISSIONS" -ne -1 ]; then
     debug "Adjusting permissions for $BACKUP_DIR: Setting owner $UID:$GID and permissions $BACKUP_DIR_PERMISSIONS."
     chown -R "$UID:$GID" "$BACKUP_DIR"
@@ -40,6 +48,14 @@ adjust_permissions() {
   else
     info "\$LOG_DIR_PERMISSIONS set to -1. Skipping adjustment of permissions."
   fi
+
+  if [ "$HEALTHCHECK_FILE_PERMISSIONS" -ne -1 ]; then
+    debug "Adjusting permissions for $HEALTHCHECK_FILE: Setting owner $UID:$GID and permissions $HEALTHCHECK_FILE_PERMISSIONS."
+    chown -R "$UID:$GID" "$HEALTHCHECK_FILE"
+    chmod -R "$HEALTHCHECK_FILE_PERMISSIONS" "$HEALTHCHECK_FILE"
+  else
+    info "\$HEALTHCHECK_FILE_PERMISSIONS set to -1. Skipping adjustment of permissions."
+  fi
 }
 
 # Initialization
@@ -47,6 +63,16 @@ init_folders() {
   if [ ! -d "$BACKUP_DIR" ]; then
     info "Creating $BACKUP_DIR."
     install -o "$UID" -g "$GID" -m "$BACKUP_DIR_PERMISSIONS" -d "$BACKUP_DIR"
+  fi
+
+  if [ ! -d "$APP_DIR" ]; then
+    info "Creating $APP_DIR."
+    install -o "$UID" -g "$GID" -m "$APP_DIR_PERMISSIONS" -d "$APP_DIR"
+  fi
+
+  if [ ! -f "$HEALTHCHECK_FILE" ]; then
+    info "Creating $HEALTHCHECK_FILE."
+    printf 0 > "$HEALTHCHECK_FILE"
   fi
 
   if [ ! -d "$LOG_DIR" ]; then

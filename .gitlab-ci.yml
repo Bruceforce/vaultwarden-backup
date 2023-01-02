@@ -14,7 +14,7 @@ variables:
   DOCKER_TLS_VERIFY: 1
   DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
   # See https://github.com/docker/buildx/releases
-  BUILDX_VERSION: v0.7.1
+  BUILDX_VERSION: v0.9.1
   BUILDX_ARCH: linux-amd64
 
 .docker_login: &docker_login
@@ -47,7 +47,7 @@ build and release:main:
     - semantic-release
     - .gitlab/build-and-release.sh latest
   rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH == "main"
 
 build and release:
   <<: *docker_build
@@ -56,4 +56,4 @@ build and release:
     - .gitlab/prepare-release.sh 0.0.0-$CI_COMMIT_REF_SLUG
     - .gitlab/build-and-release.sh $CI_COMMIT_REF_SLUG
   rules:
-    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH != "main"

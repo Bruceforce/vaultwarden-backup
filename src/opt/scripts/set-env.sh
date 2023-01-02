@@ -69,6 +69,8 @@ check_deprecations
 
 # Set default environment variables
 # Environment variables specific to this image
+export APP_DIR="${APP_DIR:-/app}"
+export APP_DIR_PERMISSIONS="${APP_DIR_PERMISSIONS:-700}"
 export BACKUP_DIR="${BACKUP_DIR:-/backup}"
 export BACKUP_DIR_PERMISSIONS="${BACKUP_DIR_PERMISSIONS:-700}"
 export CRON_TIME="${CRON_TIME:-0 5 * * *}"
@@ -76,12 +78,15 @@ export TIMESTAMP="${TIMESTAMP:-false}"
 export UID="${UID:-100}"
 export GID="${GID:-100}"
 export CRONFILE="${CRONFILE:-/etc/crontabs/root}"
-export LOG_DIR="${LOG_DIR:-/app/log}"
+export LOG_DIR="${LOG_DIR:-$APP_DIR/log}"
 export LOG_DIR_PERMISSIONS="${LOG_DIR_PERMISSIONS:-777}"
 export LOGFILE_APP="${LOGFILE_APP:-$LOG_DIR/app.log}"
 export LOGFILE_CRON="${LOGFILE_CRON:-$LOG_DIR/cron.log}"
 export DELETE_AFTER="${DELETE_AFTER:-0}"
 export VW_BACKUP_VERSION="0.0.0-dev"
+export HEALTHCHECK_FILE="${HEALTHCHECK_FILE:-$APP_DIR/health}"
+export HEALTHCHECK_FILE_PERMISSIONS="${HEALTHCHECK_FILE_PERMISSIONS:-700}"
+
 
 # Additional backup files
 export BACKUP_ADD_DATABASE="${BACKUP_ADD_DATABASE:-true}"
