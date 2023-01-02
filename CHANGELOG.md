@@ -1,3 +1,16 @@
+# [1.1.0](https://gitlab.com/1O/vaultwarden-backup/compare/v1.0.4...v1.1.0) (2023-01-02)
+
+
+### Bug Fixes
+
+* Added error counter to critical errors ([0f53b1d](https://gitlab.com/1O/vaultwarden-backup/commit/0f53b1d31b841d9d932fcc860399c211ff44684e))
+* init health file ([a327c8e](https://gitlab.com/1O/vaultwarden-backup/commit/a327c8e5506a39b5f688d449eb3ddc987c6822df))
+
+
+### Features
+
+* added container health check ([c3364dd](https://gitlab.com/1O/vaultwarden-backup/commit/c3364dda22a0ab7117a2bc77d519435668d45880))
+
 ## [1.0.4](https://gitlab.com/1O/vaultwarden-backup/compare/v1.0.3...v1.0.4) (2022-04-19)
 
 
