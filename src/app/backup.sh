@@ -15,8 +15,8 @@ init() {
     TIMESTAMP_PREFIX="$(date "+%F-%H%M%S")_"
   fi
 
-  BACKUP_FILE_DB=$BACKUP_DIR/${TIMESTAMP_PREFIX}db.sqlite3
-  BACKUP_FILE_DATA=$BACKUP_DIR/${TIMESTAMP_PREFIX}data.tar.gz
+  BACKUP_FILE_DB=/tmp/db.sqlite3
+  BACKUP_FILE_ARCHIVE="$BACKUP_DIR/${TIMESTAMP_PREFIX}backup.tar.gz"
 
     if [ ! -f "$VW_DATABASE_URL" ]; then
       printf 1 > "$HEALTHCHECK_FILE"
@@ -24,24 +24,23 @@ init() {
   fi
 }
 
-# Backup the database
-backup_database() {
-  if /usr/bin/sqlite3 "$VW_DATABASE_URL" ".backup '$BACKUP_FILE_DB'"; then 
-    info "Backup of the database to $BACKUP_FILE_DB was successfull" >> "$LOGFILE_APP"
+# Backup database and additional data like attachments, sends, etc.
+backup() {
+  if [ "$BACKUP_ADD_DATABASE" = true ] && /usr/bin/sqlite3 "$VW_DATABASE_URL" ".backup '$BACKUP_FILE_DB'"; then
+    set -- "$BACKUP_FILE_DB"
+    info "Backup of the database was successfull" >> "$LOGFILE_APP"
+    debug "Written temporary backup file to $BACKUP_FILE_DB"
   else
     error "Backup of the database failed" >> "$LOGFILE_APP"
   fi
-}
 
-# Backup additional data like attachments, sends, etc.
-backup_additional_data() {
-  if [ "$BACKUP_ADD_ATTACHMENTS" = true ] && [ -e "$VW_ATTACHMENTS_FOLDER" ]; then set -- "$VW_ATTACHMENTS_FOLDER"; fi
+  if [ "$BACKUP_ADD_ATTACHMENTS" = true ] && [ -e "$VW_ATTACHMENTS_FOLDER" ]; then set -- "$@" "$VW_ATTACHMENTS_FOLDER"; fi
   if [ "$BACKUP_ADD_ICON_CACHE" = true ] && [ -e "$VW_ICON_CACHE_FOLDER" ]; then set -- "$@" "$VW_ICON_CACHE_FOLDER"; fi
   if [ "$BACKUP_ADD_SENDS" = true ] && [ -e "$VW_DATA_FOLDER/sends" ]; then set -- "$@" "$VW_DATA_FOLDER/sends"; fi
   if [ "$BACKUP_ADD_CONFIG_JSON" = true ] && [ -e "$VW_DATA_FOLDER/config.json" ]; then set -- "$@" "$VW_DATA_FOLDER/config.json"; fi
   if [ "$BACKUP_ADD_RSA_KEY" = true ]; then
     rsa_keys="$(find "$VW_DATA_FOLDER" -iname 'rsa_key*')"
-    debug "found RSA keys $rsa_keys" >> "$LOGFILE_APP"
+    debug "found RSA keys: $rsa_keys" >> "$LOGFILE_APP"
     for rsa_key in $rsa_keys; do
       set -- "$@" "$rsa_key"
     done
@@ -51,6 +50,12 @@ backup_additional_data() {
   loop_ctr=0
   for i in "$@"; do
     if [ "$loop_ctr" -eq 0 ]; then debug "Clear \$@ on first loop" >> "$LOGFILE_APP"; set --; fi
+
+    # Ensure that database will be put into the root folder of the backup archive
+    if [ "$i" = "$BACKUP_FILE_DB" ]; then
+      debug "filepath of $i matches $BACKUP_FILE_DB. This means we can put this into the root folder of the backup archive." >> "$LOGFILE_APP"
+      set -- "$@" "$(basename "$i")"
+    fi
 
     # Prevent the "leading slash" warning from tar command
     if [ "$(dirname "$i")" = "$VW_DATA_FOLDER" ]; then
@@ -65,11 +70,12 @@ backup_additional_data() {
 
   # Run the backup command for additional data folders
   # We need to use the "cd" here instead of "tar -C ..." because of the wildcard for RSA keys.
-  #"$(cd "$VW_DATA_FOLDER" && bin/tar -czf "$BACKUP_FILE_DATA" "$@")"
-  if /bin/tar -czf "$BACKUP_FILE_DATA" -C "$VW_DATA_FOLDER" "$@"; then
-    info "Backup of additional data folders to $BACKUP_FILE_DATA was successfull" >> "$LOGFILE_APP"
+  #"$(cd "$VW_DATA_FOLDER" && bin/tar -czf "$BACKUP_FILE_ARCHIVE" "$@")"
+  if /bin/tar -czf "$BACKUP_FILE_ARCHIVE" -C "$VW_DATA_FOLDER" "$@"; then
+    info "Successfully created backup archive $BACKUP_FILE_ARCHIVE" >> "$LOGFILE_APP"
+    rm "$BACKUP_FILE_DB"
   else
-    error "Backup of additional data folders failed" >> "$LOGFILE_APP"
+    error "Backup failed" >> "$LOGFILE_APP"
   fi
 }
 
@@ -111,19 +117,8 @@ init
 # Dump Env if INFO or DEBUG
 [ "$LOG_LEVEL_NUMBER" -ge 6 ] && (set > "${LOG_DIR}/env.txt")
 
-# Run the backup command for the database file
-if [ "$BACKUP_ADD_DATABASE" = true ]; then
-  backup_database
-fi
-
-# Run the backup command for additional data folders
-if [ "$BACKUP_ADD_ATTACHMENTS" = true ] \
-    || [ "$BACKUP_ADD_CONFIG_JSON" = true ] \
-    || [ "$BACKUP_ADD_ICON_CACHE" = true ] \
-    || [ "$BACKUP_ADD_RSA_KEY" = true ] \
-    || [ "$BACKUP_ADD_SENDS" = true ]; then
-  backup_additional_data
-fi
+# Run the backup command
+backup
 
 # Perform healthcheck
 perform_healthcheck

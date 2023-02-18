@@ -67,9 +67,6 @@ There is no automated restore process to prevent accidential data loss. So if yo
 # Delete any existing sqlite3 files
 rm /var/lib/docker/volumes/vaultwarden/_data/db.sqlite3*
 
-# Copy the database to the vaultwarden folder
-cp ./backup/db.sqlite3 /var/lib/docker/volumes/vaultwarden/_data/db.sqlite3
-
 # Extract the additional folder from the archive
 tar -xzvf ./backup/data.tar.gz -C /var/lib/docker/volumes/vaultwarden/_data/
 ```
