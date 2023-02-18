@@ -31,16 +31,17 @@ services:
       - BACKUP_ADD_ATTACHMENTS=true
       - BACKUP_ADD_CONFIG_JSON=true
       - DELETE_AFTER=1
-      - TIMESTAMP=false
+      - TIMESTAMP=true
       - CRON_TIME=*/1 * * * *
       - TZ=Europe/Berlin
       - UID=1000
       - GID=1000
       - BACKUP_DIR=/backup
       #- BACKUP_DIR_PERMISSIONS=777
-      - BACKUP_DIR_PERMISSIONS=-1
-      - LOG_DIR_PERMISSIONS=-1
+      #- BACKUP_DIR_PERMISSIONS=-1
+      #- LOG_DIR_PERMISSIONS=-1
       - LOG_DIR=/backup/logs
       - LOG_LEVEL=DEBUG
+      - BACKUP_ON_STARTUP=true
 
 

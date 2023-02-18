@@ -121,6 +121,10 @@ if [ "$(id -u)" -eq 0 ]; then
   init_log
   adjust_permissions
   if [ "$1" = "manual" ]; then manual_mode; fi
+  if [ "$BACKUP_ON_STARTUP" = true ]; then
+    info "Creating first backup on startup."
+    $BACKUP_CMD
+  fi
   init_cron
 fi
 
