@@ -6,17 +6,18 @@ A simple cron powered backup image for [vaultwarden](https://github.com/dani-gar
 
 ## Why vaultwarden-backup?
 
-You might ask yourself "Why should I use a container for backing up my vaultwarden files if I can just include them in my regular backup?". One caveat of using regular backup software for database is, that you shoud always stop your database server before you make a backup or you will risk data loss. To prevent this a proper backup command for your database should be used.
+You might ask yourself "Why should I use a container for backing up my vaultwarden files if I can just include them in my regular backup?". One caveat of using regular backup software for databases is, that you shoud always stop your database server before you make a backup or you will risk data loss. To prevent this a proper backup command for your database should be used.
 
 Of course you could just create a cron job on your host with something like `sqlite3 "$VW_DATABASE_URL" ".backup '$BACKUP_FILE_DB'"` and back up the additional files and folders (like the attachments folder), using your preferred backup solution.
 
-However on some systems you are not able to add cronjobs by yourself, for example common NAS venderos don't allow this. That's why this image exists. Additionally it also includes the most important files and puts them in a `tar.gz` archive from where on your regular backup software could handle this files.
+However on some systems you are not able to add cronjobs by yourself, for example common NAS venderos don't allow this. That's why this image exists. Additionally it also includes the most important files and puts them in a `tar.xz` archive from where on your regular backup software could handle this files.
 
 ## Which files are included in the backup?
 
-By default all files that are recommended to backup by the official Vaultwarden wiki <https://github.com/dani-garcia/vaultwarden/wiki/Backing-up-your-vault> are backed up per default.
+By default all files that are recommended to backup by the official Vaultwarden wiki <https://github.com/dani-garcia/vaultwarden/wiki/Backing-up-your-vault> are backed up per default. You can modify this behavior with environment variables.
 
 ## Usage
+
 Since version v0.0.7 you can always use the `latest` tag, since the image is build with
 multi-arch support. Of course you can always use the version tags `vx.y.z` to stick
 to a specific version. Note however that there will be no security updates for the
@@ -25,8 +26,11 @@ alpine base image if you stick to a version.
 Make sure that your **vaultwarden container is named `vaultwarden`** otherwise 
 you have to replace the container name in the `--volumes-from` section of the `docker run` call.
 
-### Automatic Backups 
+### Automatic Backups
+
 A cron daemon is running inside the container and the container keeps running in background.
+
+The easiest way to use this is by adjusting the [docker-compose.yml](docker-compose.yml) to your needs. Below you find some example commands using `docker run`
 
 Start backup container with default settings (automatic backup at 5 am)
 ```sh
@@ -44,6 +48,7 @@ docker run -d --restart=always --name vaultwarden --volumes-from=vaultwarden -e 
 ```
 
 ### Manual Backups
+
 You can use the crontab of your host to schedule the backup and the container will only be running during the backup process.
 
 ```sh
@@ -59,6 +64,26 @@ docker run --rm --volumes-from=vaultwarden -e UID=0 -e BACKUP_DIR=/myBackup -e T
 
 Keep in mind that the commands will be executed *inside* the container. So `$BACKUP_DIR` can be any place inside the container. Easiest would be to set it to `/data/backup` which will create the backup next to the original database file.
 
+### Encryption/Decryption
+
+The backup tar.xz archive can be optionally encrypted. This can be useful if you keep sensitive attachments like ssh-keys in your vault and save the backup in an untrusted location.
+
+Since we use the tar command, because its most common on Linux systems and tar offers no encryption flag on its own, gpg is used to encrypt the tar.xz archive.
+There are two different ways to enable encryption of the backup: symmetric and asymmetric. You can only choose one of these two. If you set environment variables for both only asymmetric encryption will be performed.
+
+#### Encryption via passphrase (symmetric)
+
+The easiest way to encrypt the backup is by using symmetric encryption with a passphrase. This can be done by setting `ENCRYPTION_PASSWORD=<YourPassword>` in the environment variables.
+However in some uses cases it might not be useful to store a passphrase as environment variable. In this cases you can encrypt the backup with your gpg public key.
+
+#### Encryption via gpg public key (asymmetric)
+
+Another way to encrypt the backup is by using a gpg public key. The public key needs to be provided as base64 string without line breaks. On most systems this can be achieved by `base64 -w 0 PathToYourPublicKey.asc`. After that set the environment variable `ENCRYPTION_BASE64_GPG_KEY` to your base64 encoded gpg public key.
+
+#### Decryption
+
+To decrypt the file you need to run `gpg --decrypt backup.tar.xz.gpg > backup.tar.xz`. This works for both encryption options. If you use gpg public key for encryption you must import your gpg keypair to your local keychain before this command works. For symmetric encryption this command just asks for your passphrase.
+
 ### Restore
 
 There is no automated restore process to prevent accidential data loss. So if you need to restore a backup you need to do this manually by following the steps below (assuming your backups are located at `./backup/` and your vaultwarden data ist located at `/var/lib/docker/volumes/vaultwarden/_data/`)
@@ -67,48 +92,57 @@ There is no automated restore process to prevent accidential data loss. So if yo
 # Delete any existing sqlite3 files
 rm /var/lib/docker/volumes/vaultwarden/_data/db.sqlite3*
 
-# Extract the additional folder from the archive
-tar -xzvf ./backup/data.tar.gz -C /var/lib/docker/volumes/vaultwarden/_data/
+# Extract the archive
+# You may need to install xz first
+tar -xJvf ./backup/data.tar.xz -C /var/lib/docker/volumes/vaultwarden/_data/
 ```
 
 ## Environment variables
-| ENV                          | Description                                                                         |
-| ---------------------------- | ----------------------------------------------------------------------------------- |
-| APP_DIR                      | App dir inside the container (should not be changed)                                |
-| APP_DIR_PERMISSIONS          | Permissions of app dir inside container (should not be changed)                     |
-| BACKUP_ADD_DATABASE [^3]     | Set to `true` to include the database itself in the backup                          |
-| BACKUP_ADD_ATTACHMENTS [^3]  | Set to `true` to include the attachments folder in the backup                       |
-| BACKUP_ADD_CONFIG_JSON [^3]  | Set to `true` to include `config.json` in the backup                                |
-| BACKUP_ADD_ICON_CACHE [^3]   | Set to `true` to include the icon cache folder in the backup                        |
-| BACKUP_ADD_RSA_KEY [^3]      | Set to `true` to include the RSA keys in the backup                                 |
-| BACKUP_ADD_SENDS [^3]        | Set to `true` to include the sends folder in the backup                             |
-| BACKUP_DIR                   | Seths the path of the backup folder *inside* the container                          |
-| BACKUP_DIR_PERMISSIONS       | Sets the permissions of the backup folder (**CAUTION** [^1]). Set to -1 to disable. |
-| BACKUP_ON_STARTUP            | Creates a backup right after container startup                                      |
-| CRONFILE                     | Path to the cron file *inside* the container                                        |
-| CRON_TIME                    | Cronjob format "Minute Hour Day_of_month Month_of_year Day_of_week Year"            |
-| DELETE_AFTER                 | Delete old backups after X many days. Set to 0 to disable                           |
-| TIMESTAMP                    | Set to `true` to append timestamp to the backup file                                |
-| GID                          | Group ID to run the cron job with                                                   |
-| HEALTHCHECK_URL              | Set a healthcheck url like <https://hc-ping.com/xyz>                                |
-| HEALTHCHECK_FILE             | Set the path of the local healtcheck (container health) file                        |
-| HEALTHCHECK_FILE_PERMISSIONS | Set the permissions of the local healtcheck (container health) file                 |
-| LOG_LEVEL                    | DEBUG, INFO, WARNING, ERROR, CRITICAL are supported                                 |
-| LOG_DIR                      | Path to the logfile folder *inside* the container                                   |
-| LOG_DIR_PERMISSIONS          | Set the permissions of the logfile folder. Set to -1 to disable.                    |
-| TZ                           | Set the timezone inside the container [^2]                                          |
-| UID                          | User ID to run the cron job with                                                    |
-| VW_DATA_FOLDER [^4]          | Set the location of the vaultwarden data folder *inside* the container              |
-| VW_DATABASE_URL [^4]         | Set the location of the vaultwarden database file *inside* the container            |
-| VW_ATTACHMENTS_FOLDER [^4]   | Set the location of the vaultwarden attachments folder *inside* the container       |
-| VW_ICON_CACHE_FOLDER [^4]    | Set the location of the vaultwarden icon cache folder *inside* the container        |
 
 For default values see [src/opt/scripts/set-env.sh](src/opt/scripts/set-env.sh)
+
+| ENV                             | Description                                                                         |
+| ------------------------------- | ----------------------------------------------------------------------------------- |
+| APP_DIR                         | App dir inside the container (should not be changed)                                |
+| APP_DIR_PERMISSIONS             | Permissions of app dir inside container (should not be changed)                     |
+| BACKUP_ADD_DATABASE [^3]        | Set to `true` to include the database itself in the backup                          |
+| BACKUP_ADD_ATTACHMENTS [^3]     | Set to `true` to include the attachments folder in the backup                       |
+| BACKUP_ADD_CONFIG_JSON [^3]     | Set to `true` to include `config.json` in the backup                                |
+| BACKUP_ADD_ICON_CACHE [^3]      | Set to `true` to include the icon cache folder in the backup                        |
+| BACKUP_ADD_RSA_KEY [^3]         | Set to `true` to include the RSA keys in the backup                                 |
+| BACKUP_ADD_SENDS [^3]           | Set to `true` to include the sends folder in the backup                             |
+| BACKUP_DIR                      | Seths the path of the backup folder *inside* the container                          |
+| BACKUP_DIR_PERMISSIONS          | Sets the permissions of the backup folder (**CAUTION** [^1]). Set to -1 to disable. |
+| BACKUP_ON_STARTUP               | Creates a backup right after container startup                                      |
+| CRONFILE                        | Path to the cron file *inside* the container                                        |
+| CRON_TIME                       | Cronjob format "Minute Hour Day_of_month Month_of_year Day_of_week Year"            |
+| DELETE_AFTER                    | Delete old backups after X many days. Set to 0 to disable                           |
+| ENCRYPTION_ALGORITHM [^5]       | Set the symmetric encryption algorithm  (only used with ENCRYPTION_PASSWORD)        |
+| ENCRYPTION_BASE64_GPG_KEY       | BASE64 encoded gpg public key. Set to `false` to disable.                           |
+| ENCRYPTION_GPG_KEYFILE_LOCATION | File path of the gpg public key inside the container (should not be changed)        |
+| ENCRYPTION_PASSWORD             | Encryption password for symmetric encryption. Set to `false` to disable.            |
+| TIMESTAMP                       | Set to `true` to append timestamp to the backup file                                |
+| GID                             | Group ID to run the cron job with                                                   |
+| GNUPGHOME                       | GNUPG home folder inside the container (should not be changed)                      |
+| GNUPGHOME_PERMISSIONS           | Permissions of the GNUPGHOME folder (should not be changed)                         |
+| HEALTHCHECK_URL                 | Set a healthcheck url like <https://hc-ping.com/xyz>                                |
+| HEALTHCHECK_FILE                | Set the path of the local healtcheck (container health) file                        |
+| HEALTHCHECK_FILE_PERMISSIONS    | Set the permissions of the local healtcheck (container health) file                 |
+| LOG_LEVEL                       | DEBUG, INFO, WARNING, ERROR, CRITICAL are supported                                 |
+| LOG_DIR                         | Path to the logfile folder *inside* the container                                   |
+| LOG_DIR_PERMISSIONS             | Set the permissions of the logfile folder. Set to -1 to disable.                    |
+| TZ                              | Set the timezone inside the container [^2]                                          |
+| UID                             | User ID to run the cron job with                                                    |
+| VW_DATA_FOLDER [^4]             | Set the location of the vaultwarden data folder *inside* the container              |
+| VW_DATABASE_URL [^4]            | Set the location of the vaultwarden database file *inside* the container            |
+| VW_ATTACHMENTS_FOLDER [^4]      | Set the location of the vaultwarden attachments folder *inside* the container       |
+| VW_ICON_CACHE_FOLDER [^4]       | Set the location of the vaultwarden icon cache folder *inside* the container        |
 
 [^1]: The permissions should at least be 700 since the backup folder itself gets the same permissions and with 600 it would not be accessible.
 [^2]: see <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones> for more information
 [^3]: See <https://github.com/dani-garcia/vaultwarden/wiki/Backing-up-your-vault> for more details
 [^4]: See <https://github.com/dani-garcia/vaultwarden/wiki/Changing-persistent-data-location> for more details
+[^5]: See `gpg --version` for possible options.
 
 ## FAQ
 ### I get an error like "unable to open database file"

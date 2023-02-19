@@ -1,18 +1,6 @@
 ---
 version: '3.7'
 services:
-# this will build the image - usually not needed
-  # backup_test:
-  #   build: ./
-  #   command: manual
-  #   volumes:
-  #    - vaultwarden:/data/
-  #    - ./test:/backup/
-  #   restart: on-failure
-  #   init: true
-  #   env_file:
-  #     - .env
-
   vaultwarden:
     image: vaultwarden/server
     container_name: vaultwarden
