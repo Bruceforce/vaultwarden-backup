@@ -15,7 +15,7 @@ if [ "$LOG_LEVEL" = "CRITICAL" ]; then LOG_LEVEL_NUMBER=2; fi
 
 # General log format
 log() {
-  printf "$(date "+%F %T") - %b\n" "$*"
+  printf "$(date "+%F %T") - %b\n" "$*" >> "$LOGFILE_APP"
 }
 
 # Debug log
@@ -57,5 +57,6 @@ critical() {
   if [ "$LOG_LEVEL_NUMBER" -ge 2 ]; then
     log "CRITICAL - $*\nExiting"
   fi
+  cat "$LOGFILE_APP"
   exit 1
 }

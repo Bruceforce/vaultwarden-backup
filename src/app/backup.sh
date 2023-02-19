@@ -20,7 +20,7 @@ init() {
 
     if [ ! -f "$VW_DATABASE_URL" ]; then
       printf 1 > "$HEALTHCHECK_FILE"
-      critical "Database $VW_DATABASE_URL not found! Please check if you mounted the vaultwarden volume (in docker-compose or with '--volumes-from=vaultwarden'!)" >> "$LOGFILE_APP"
+      critical "Database $VW_DATABASE_URL not found! Please check if you mounted the vaultwarden volume (in docker-compose or with '--volumes-from=vaultwarden'!)"
   fi
 }
 
@@ -40,7 +40,7 @@ backup() {
   if [ "$BACKUP_ADD_CONFIG_JSON" = true ] && [ -e "$VW_DATA_FOLDER/config.json" ]; then set -- "$@" "$VW_DATA_FOLDER/config.json"; fi
   if [ "$BACKUP_ADD_RSA_KEY" = true ]; then
     rsa_keys="$(find "$VW_DATA_FOLDER" -iname 'rsa_key*')"
-    debug "found RSA keys: $rsa_keys" >> "$LOGFILE_APP"
+    debug "found RSA keys: $rsa_keys"
     for rsa_key in $rsa_keys; do
       set -- "$@" "$rsa_key"
     done
@@ -49,7 +49,7 @@ backup() {
   debug "\$@ is: $*" >> "$LOGFILE_APP"
   loop_ctr=0
   for i in "$@"; do
-    if [ "$loop_ctr" -eq 0 ]; then debug "Clear \$@ on first loop" >> "$LOGFILE_APP"; set --; fi
+    if [ "$loop_ctr" -eq 0 ]; then debug "Clear \$@ on first loop"; set --; fi
 
     # Ensure that database will be put into the root folder of the backup archive
     if [ "$i" = "$BACKUP_FILE_DB" ]; then
@@ -75,16 +75,16 @@ backup() {
     info "Successfully created backup archive $BACKUP_FILE_ARCHIVE" >> "$LOGFILE_APP"
     rm "$BACKUP_FILE_DB"
   else
-    error "Backup failed" >> "$LOGFILE_APP"
+      error "Backup failed"
   fi
 }
 
 # Performs a healthcheck
 perform_healthcheck() {
-  debug "\$error_counter=$error_counter" >> "$LOGFILE_APP"
+  debug "\$error_counter=$error_counter"
 
   if [ "$error_counter" -ne 0 ]; then
-    warn "There were $error_counter errors during backup. Not sending health check ping." >> "$LOGFILE_APP"
+    warn "There were $error_counter errors during backup. Not sending health check ping."
     printf 1 > "$HEALTHCHECK_FILE"
     return 1
   fi
@@ -92,20 +92,20 @@ perform_healthcheck() {
   # At this point the container is healthy. So we create a health-check file used to determine container health
   # and send a health check ping if the HEALTHCHECK_URL is set.
   printf 0 > "$HEALTHCHECK_FILE"
-  debug "Evaluating \$HEALTHCHECK_URL" >> "$LOGFILE_APP"
+  debug "Evaluating \$HEALTHCHECK_URL"
   if [ -z "$HEALTHCHECK_URL" ]; then
-    debug "Variable \$HEALTHCHECK_URL not set. Skipping health check." >> "$LOGFILE_APP"
+    debug "Variable \$HEALTHCHECK_URL not set. Skipping health check."
     return 0
   fi
   
-  info "Sending health check ping." >> "$LOGFILE_APP"
+  info "Sending health check ping."
   wget "$HEALTHCHECK_URL" -T 10 -t 5 -q -O /dev/null
 }
 
 cleanup() {
   if [ -n "$DELETE_AFTER" ] && [ "$DELETE_AFTER" -gt 0 ]; then
-    if [ "$TIMESTAMP" != true ]; then warn "DELETE_AFTER will most likely have no effect because TIMESTAMP is not set to true." >> "$LOGFILE_APP"; fi
-    find "$BACKUP_DIR" -type f -mtime +"$DELETE_AFTER" -exec sh -c '. /opt/scripts/logging.sh; file="$1"; rm -f "$file"; info "Deleted backup "$file" after $DELETE_AFTER days"' shell {} \;  >> "$LOGFILE_APP"
+    if [ "$TIMESTAMP" != true ]; then warn "DELETE_AFTER will most likely have no effect because TIMESTAMP is not set to true."; fi
+    find "$BACKUP_DIR" -type f -mtime +"$DELETE_AFTER" -exec sh -c '. /opt/scripts/logging.sh; file="$1"; rm -f "$file"; info "Deleted backup "$file" after $DELETE_AFTER days"' shell {} \; 
   fi
 }
 
@@ -113,9 +113,6 @@ cleanup() {
 
 # Run init
 init
-
-# Dump Env if INFO or DEBUG
-[ "$LOG_LEVEL_NUMBER" -ge 6 ] && (set > "${LOG_DIR}/env.txt")
 
 # Run the backup command
 backup
