@@ -23,6 +23,8 @@ set -- --tag "$CI_REGISTRY_IMAGE:$TAG"
 if [ -n "$CI_REGISTRY_USER" ] && [ -n "$DOCKERHUB_PASSWORD" ] && [ -n "$DOCKERHUB_REGISTRY" ]&& [ -n "$DOCKERHUB_USER" ]&& [ -n "$DOCKERHUB_REPO" ]; then
     docker login -u "$DOCKERHUB_USER" -p "$DOCKERHUB_PASSWORD" "$DOCKERHUB_REGISTRY"
     set -- "$@" --tag "$DOCKERHUB_USER/$DOCKERHUB_REPO:$TAG"
+    # Used to update deprecated image
+    set -- "$@" --tag "$DOCKERHUB_USER/bw_backup:$TAG"
 fi
 
 build "$@"
