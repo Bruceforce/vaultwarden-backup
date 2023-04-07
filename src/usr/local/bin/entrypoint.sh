@@ -60,31 +60,63 @@ adjust_permissions() {
 
 # Initialization
 init_folders() {
+  if [ -d "$LOG_DIR" ] && [ "$LOG_CLEAR_AT_START" = true ]; then
+    rm -rf "${LOG_DIR:?}/"*
+    debug "Purged logs."
+  fi
+
+  if [ ! -d "$LOG_DIR" ]; then
+    debug "Creating $LOG_DIR."
+    install -o "$UID" -g "$GID" -m "$LOG_DIR_PERMISSIONS" -d "$LOG_DIR"
+  fi
+
+  if [ ! -f "$LOGFILE_CRON" ]; then
+    touch "$LOGFILE_CRON" && chown "$UID:$GID" "$LOGFILE_CRON"
+  fi
+
+  if [ ! -f "$LOGFILE_APP" ]; then
+    touch "$LOGFILE_APP" && chown "$UID:$GID" "$LOGFILE_APP"
+  fi
+
+  # Dump Env if running in DEBUG mode
+[ "$LOG_LEVEL_NUMBER" -eq 7 ] && (set > "${LOG_DIR}/env.txt")
+
   if [ ! -d "$BACKUP_DIR" ]; then
-    info "Creating $BACKUP_DIR."
+    debug "Creating $BACKUP_DIR."
     install -o "$UID" -g "$GID" -m "$BACKUP_DIR_PERMISSIONS" -d "$BACKUP_DIR"
   fi
 
   if [ ! -d "$APP_DIR" ]; then
-    info "Creating $APP_DIR."
+    debug "Creating $APP_DIR."
     install -o "$UID" -g "$GID" -m "$APP_DIR_PERMISSIONS" -d "$APP_DIR"
   fi
 
   if [ ! -f "$HEALTHCHECK_FILE" ]; then
-    info "Creating $HEALTHCHECK_FILE."
+    debug "Creating $HEALTHCHECK_FILE."
     printf 0 > "$HEALTHCHECK_FILE"
   fi
 
-  if [ ! -d "$LOG_DIR" ]; then
-    info "Creating $LOG_DIR."
-    install -o "$UID" -g "$GID" -m "$LOG_DIR_PERMISSIONS" -d "$LOG_DIR"
+  if [ ! "$ENCRYPTION_BASE64_GPG_KEY" = false ] || [ ! "$ENCRYPTION_PASSWORD" = false ]; then
+    install -o "$UID" -g "$GID" -m "$GNUPGHOME_PERMISSIONS" -d "$GNUPGHOME"
+    # Run a "dummy" gpg command to generate the keyring. The keyring is needed since gpg > v2.1
+    su-exec "$UID:$GID" gpg --list-keys > /dev/null 2>&1
+  fi
+
+  if [ ! "$ENCRYPTION_BASE64_GPG_KEY" = false ]; then
+    if decoded_key=$(echo "$ENCRYPTION_BASE64_GPG_KEY" | base64 -d) > /dev/null 2>&1; then
+      debug "Saving decoded gpg public key to $ENCRYPTION_GPG_KEYFILE_LOCATION"
+      echo "$decoded_key" > "$ENCRYPTION_GPG_KEYFILE_LOCATION"
+      debug "Decoded public key is: \n$(cat "$ENCRYPTION_GPG_KEYFILE_LOCATION")"
+    else
+      critical "Decoding of \$ENCRYPTION_BASE64_GPG_KEY failed. Please ensure this is an actual base64 encoded gpg public key file."
+    fi
   fi
 }
 
 # Initialize cron
 init_cron() {
   if [ "$(grep -c "$BACKUP_CMD" "$CRONFILE")" -eq 0 ]; then
-    info "Initalizing $CRONFILE"
+    debug "Initalizing $CRONFILE"
     debug "Writing backup command \"$BACKUP_CMD\" to $CRONFILE."
     echo "$CRON_TIME $BACKUP_CMD >> $LOGFILE_APP 2>&1" | crontab -
   fi
@@ -95,19 +127,9 @@ init_cron() {
   fi
 }
 
-# Initialize logfiles
-init_log() {
-  su-exec "$UID:$GID" touch "$LOGFILE_CRON"
-  su-exec "$UID:$GID" touch "$LOGFILE_APP"
-  info "Running vaultwarden-backup version $VW_BACKUP_VERSION"
-  info "Log level set to $LOG_LEVEL" > "$LOGFILE_APP"
-  info "Container started" >> "$LOGFILE_APP"
-  debug "Environment Variables:\n$(env | sort)" >> "$LOGFILE_APP"
-}
-
 # Run backup in manual mode and exit
 manual_mode() {
-  info "Running in manual mode." >> "$LOGFILE_APP"
+  info "Running in manual mode."
   $BACKUP_CMD
   cat "$LOGFILE_APP"
   exit 0
@@ -118,9 +140,19 @@ manual_mode() {
 # Init only when run as root because of permissions
 if [ "$(id -u)" -eq 0 ]; then
   init_folders
-  init_log
   adjust_permissions
+
+  info "Container started"
+  info "Running vaultwarden-backup version $VW_BACKUP_VERSION"
+  info "Log level set to $LOG_LEVEL"
+  debug "Environment Variables:\n$(env | sort)" 
+
   if [ "$1" = "manual" ]; then manual_mode; fi
+  if [ "$BACKUP_ON_STARTUP" = true ]; then
+    info "Creating first backup on startup."
+    $BACKUP_CMD
+  fi
+
   init_cron
 fi
 
