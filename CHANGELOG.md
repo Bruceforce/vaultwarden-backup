@@ -1,3 +1,21 @@
+# [2.0.0](https://gitlab.com/1O/vaultwarden-backup/compare/v1.1.0...v2.0.0) (2023-04-07)
+
+
+* Merge branch 'dev' into 'main' ([7a98065](https://gitlab.com/1O/vaultwarden-backup/commit/7a9806595c81aacf4d4c838601fca196317155c5))
+
+
+### Features
+
+* Added BACKUP_ON_STARTUP ([4952ce3](https://gitlab.com/1O/vaultwarden-backup/commit/4952ce3c963d6f287c76decadc6c93133821c34d))
+* Password protection and switch to xz ([fb4b207](https://gitlab.com/1O/vaultwarden-backup/commit/fb4b207f23f8b311ebe3230eee352069ebe75de2)), closes [#28](https://gitlab.com/1O/vaultwarden-backup/issues/28)
+
+
+### BREAKING CHANGES
+
+* Include database backup in tar
+
+See merge request 1O/vaultwarden-backup!13
+
 # [1.1.0](https://gitlab.com/1O/vaultwarden-backup/compare/v1.0.4...v1.1.0) (2023-01-02)
 
 
