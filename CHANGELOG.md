@@ -1,3 +1,10 @@
+## [2.0.1](https://gitlab.com/1O/vaultwarden-backup/compare/v2.0.0...v2.0.1) (2023-06-02)
+
+
+### Bug Fixes
+
+* version number in latest builds was incorrect ([5c55d02](https://gitlab.com/1O/vaultwarden-backup/commit/5c55d0292fee0a569d43b96b9500e5a8437ea483)), closes [#30](https://gitlab.com/1O/vaultwarden-backup/issues/30)
+
 # [2.0.0](https://gitlab.com/1O/vaultwarden-backup/compare/v1.1.0...v2.0.0) (2023-04-07)
 
 
