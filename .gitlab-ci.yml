@@ -45,6 +45,7 @@ build and release:main:
   <<: *docker_build
   script:
     - semantic-release
+    - .gitlab/prepare-release.sh latest@$(date -Iseconds) # Also build latest version if there is no new release
     - .gitlab/build-and-release.sh latest
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
@@ -52,7 +53,6 @@ build and release:main:
 build and release:
   <<: *docker_build
   script:
-    - semantic-release
     - .gitlab/prepare-release.sh 0.0.0-$CI_COMMIT_REF_SLUG
     - .gitlab/build-and-release.sh $CI_COMMIT_REF_SLUG
   rules:
