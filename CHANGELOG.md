@@ -1,3 +1,10 @@
+## [2.0.2](https://gitlab.com/1O/vaultwarden-backup/compare/v2.0.1...v2.0.2) (2023-07-01)
+
+
+### Bug Fixes
+
+* re-initiate cron on change ([eb37e56](https://gitlab.com/1O/vaultwarden-backup/commit/eb37e563505b11f25d4f5289f8f8a4093a5a1cf9))
+
 ## [2.0.1](https://gitlab.com/1O/vaultwarden-backup/compare/v2.0.0...v2.0.1) (2023-06-02)
 
 
