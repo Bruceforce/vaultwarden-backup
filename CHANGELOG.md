@@ -1,3 +1,10 @@
+## [2.0.3](https://gitlab.com/1O/vaultwarden-backup/compare/v2.0.2...v2.0.3) (2023-07-01)
+
+
+### Bug Fixes
+
+* fixed cronjob ([a2aaccb](https://gitlab.com/1O/vaultwarden-backup/commit/a2aaccb78664adbb6ac2df9481c58f0b74b9ee5c)), closes [#32](https://gitlab.com/1O/vaultwarden-backup/issues/32)
+
 ## [2.0.2](https://gitlab.com/1O/vaultwarden-backup/compare/v2.0.1...v2.0.2) (2023-07-01)
 
 
