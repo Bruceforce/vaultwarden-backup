@@ -35,28 +35,28 @@ info() {
 # Warning log
 warn() {
   warning_counter=$((warning_counter + 1))
-  debug "The new warning counter is $warning_counter."
   if [ "$LOG_LEVEL_NUMBER" -ge 4 ]; then
     log "WARNING - $*"
   fi
+  debug "The new warning counter is $warning_counter."
 }
 
 # Error log
 error() {
   error_counter=$((error_counter + 1))
-  debug "The new error counter is $error_counter."
   if [ "$LOG_LEVEL_NUMBER" -ge 3 ]; then
     log "ERROR - $*" 1>&2
   fi
+  debug "The new error counter is $error_counter."
 }
 
 # Critical log
 critical() {
   error_counter=$((error_counter + 1))
-  debug "The new error counter is $error_counter."
   if [ "$LOG_LEVEL_NUMBER" -ge 2 ]; then
     log "CRITICAL - $*\nExiting"
   fi
+  debug "The new error counter is $error_counter."
   cat "$LOGFILE_APP"
   exit 1
 }
