@@ -115,8 +115,8 @@ init_folders() {
 
 # Initialize cron
 init_cron() {
-  if [ "$(grep -c "$BACKUP_CMD" "$CRONFILE")" -eq 0 ]; then
-    debug "Initalizing $CRONFILE"
+  if [ "$(grep -c "$CRON_TIME" "$CRONFILE")" -eq 0 ]; then
+    debug "(Re)initalizing $CRONFILE"
     debug "Writing backup command \"$BACKUP_CMD\" to $CRONFILE."
     echo "$CRON_TIME $BACKUP_CMD >> $LOGFILE_APP 2>&1" | crontab -
   fi
