@@ -26,49 +26,30 @@ init() {
 
 # Backup database and additional data like attachments, sends, etc.
 backup() {
+  tar_cmd="/bin/tar -cJf $BACKUP_FILE_ARCHIVE"
   # First we backup the database to a temporary file (this will later be added to a tar archive)
   if [ "$BACKUP_ADD_DATABASE" = true ] && /usr/bin/sqlite3 "$VW_DATABASE_URL" ".backup '$BACKUP_FILE_DB'"; then
-    set -- "$BACKUP_FILE_DB"
+    tar_cmd="$tar_cmd -C $(dirname "$(readlink -f $BACKUP_FILE_DB)") $(basename $BACKUP_FILE_DB)"
     debug "Written temporary backup file to $BACKUP_FILE_DB"
+    debug "Current tar command: $tar_cmd"
   else
     error "Backup of the database failed"
   fi
 
   # We use this technique to simulate an array in a POSIX compliant way
-  if [ "$BACKUP_ADD_ATTACHMENTS" = true ] && [ -e "$VW_ATTACHMENTS_FOLDER" ]; then set -- "$@" "$VW_ATTACHMENTS_FOLDER"; fi
-  if [ "$BACKUP_ADD_ICON_CACHE" = true ] && [ -e "$VW_ICON_CACHE_FOLDER" ]; then set -- "$@" "$VW_ICON_CACHE_FOLDER"; fi
-  if [ "$BACKUP_ADD_SENDS" = true ] && [ -e "$VW_DATA_FOLDER/sends" ]; then set -- "$@" "$VW_DATA_FOLDER/sends"; fi
-  if [ "$BACKUP_ADD_CONFIG_JSON" = true ] && [ -e "$VW_DATA_FOLDER/config.json" ]; then set -- "$@" "$VW_DATA_FOLDER/config.json"; fi
+  if [ "$BACKUP_ADD_ATTACHMENTS" = true ] && [ -e "$VW_ATTACHMENTS_FOLDER" ]; then tar_cmd="$tar_cmd -C $(dirname "$(readlink -f "$VW_ATTACHMENTS_FOLDER")") $(basename "$VW_ATTACHMENTS_FOLDER")"; fi
+  if [ "$BACKUP_ADD_ICON_CACHE" = true ] && [ -e "$VW_ICON_CACHE_FOLDER" ]; then tar_cmd="$tar_cmd -C $(dirname "$(readlink -f "$VW_ICON_CACHE_FOLDER")") $(basename "$VW_ICON_CACHE_FOLDER")"; fi
+  if [ "$BACKUP_ADD_SENDS" = true ] && [ -e "$VW_DATA_FOLDER/sends" ]; then tar_cmd="$tar_cmd -C $(dirname "$(readlink -f "$VW_DATA_FOLDER/sends")") $(basename "$VW_DATA_FOLDER/sends")"; fi
+  if [ "$BACKUP_ADD_CONFIG_JSON" = true ] && [ -e "$VW_DATA_FOLDER/config.json" ]; then tar_cmd="$tar_cmd -C $(dirname "$(readlink -f "$VW_DATA_FOLDER/config.json")") $(basename "$VW_DATA_FOLDER/config.json")"; fi
   if [ "$BACKUP_ADD_RSA_KEY" = true ]; then
     rsa_keys="$(find "$VW_DATA_FOLDER" -iname 'rsa_key*')"
     debug "found RSA keys: $rsa_keys"
     for rsa_key in $rsa_keys; do
-      set -- "$@" "$rsa_key"
+      tar_cmd="$tar_cmd -C $(dirname "$(readlink -f "$rsa_key")") $(basename "$rsa_key")"
     done
   fi
 
-  # Here we assemble the array and strip off the root paths (e.g. /backup)
-  debug "\$@ is: $*"
-  loop_ctr=0
-  for i in "$@"; do
-    if [ "$loop_ctr" -eq 0 ]; then debug "Clear \$@ on first loop"; set --; fi
-
-    # Ensure that database will be put into the root folder of the backup archive
-    if [ "$i" = "$BACKUP_FILE_DB" ]; then
-      debug "filepath of $i matches $BACKUP_FILE_DB. This means we can put this into the root folder of the backup archive."
-      set -- "$@" "$(basename "$i")"
-    fi
-
-    # Prevent the "leading slash" warning from tar command
-    if [ "$(dirname "$i")" = "$VW_DATA_FOLDER" ]; then
-      debug "dirname of $i matches $VW_DATA_FOLDER. This means we can scrap it."
-      set -- "$@" "$(basename "$i")"
-    fi
-
-    loop_ctr=$((loop_ctr+1))
-  done
-
-  debug "Backing up: $*"
+  debug "Current tar command: $tar_cmd"
 
   # Here we create the backup tar archive with optional encryption
   if [ "$ENCRYPTION_BASE64_GPG_KEY" != false ] && [ "$ENCRYPTION_PASSWORD" != false ]; then
@@ -77,7 +58,7 @@ backup() {
 
   if [ -f "$ENCRYPTION_GPG_KEYFILE_LOCATION" ]; then
     # Create a backup with public key encryption
-    if /bin/tar -cJ -C "$VW_DATA_FOLDER" "$@" | gpg --batch --no-options --no-tty --yes --encrypt \
+    if $tar_cmd | gpg --batch --no-options --no-tty --yes --encrypt \
         --recipient-file "$ENCRYPTION_GPG_KEYFILE_LOCATION" -o "$BACKUP_FILE_ARCHIVE.gpg"; then
       info "Successfully created gpg (public key) encrypted backup $BACKUP_FILE_ARCHIVE.gpg"
     else
@@ -85,7 +66,7 @@ backup() {
     fi
   elif [ ! "$ENCRYPTION_PASSWORD" = false ]; then
     # Create a backup with symmetric encryption
-    if /bin/tar -cJ -C "$VW_DATA_FOLDER" "$@" | gpg --batch --no-options --no-tty --yes --symmetric \
+    if $tar_cmd | gpg --batch --no-options --no-tty --yes --symmetric \
         --passphrase "$ENCRYPTION_PASSWORD" --cipher-algo "$ENCRYPTION_ALGORITHM" -o "$BACKUP_FILE_ARCHIVE.gpg"; then
       info " Successfully created gpg (password) encrypted backup $BACKUP_FILE_ARCHIVE.gpg"
     else
@@ -93,7 +74,7 @@ backup() {
     fi
   else
     # Create a backup without encryption
-    if /bin/tar -cJf "$BACKUP_FILE_ARCHIVE" -C "$VW_DATA_FOLDER" "$@"; then
+    if $tar_cmd; then
       info "Successfully created backup $BACKUP_FILE_ARCHIVE"
     else
       error "Backup failed"
