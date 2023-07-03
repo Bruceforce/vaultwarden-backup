@@ -6,6 +6,7 @@ RUN apk add --no-cache \
     busybox-suid \
     su-exec \
     tzdata \
+    tar \
     xz \
     gpg \
     gpg-agent
