@@ -1,3 +1,13 @@
+## [2.0.4](https://gitlab.com/1O/vaultwarden-backup/compare/v2.0.3...v2.0.4) (2023-07-04)
+
+
+### Bug Fixes
+
+* Do not use live database file in backup ([229b586](https://gitlab.com/1O/vaultwarden-backup/commit/229b5869ef14afc42df89ccd22c96fe75846a69d)), closes [#31](https://gitlab.com/1O/vaultwarden-backup/issues/31)
+* fixed broken gpg backup and wrong db ([3df0614](https://gitlab.com/1O/vaultwarden-backup/commit/3df0614d66c6bed1c063c04af6b4a39a5f398cc1)), closes [#31](https://gitlab.com/1O/vaultwarden-backup/issues/31) [#33](https://gitlab.com/1O/vaultwarden-backup/issues/33)
+* fixed cronjob ([9fc2ee6](https://gitlab.com/1O/vaultwarden-backup/commit/9fc2ee6f1e6cb845ccf5b3897bc562b4987d335e)), closes [#32](https://gitlab.com/1O/vaultwarden-backup/issues/32)
+* re-initiate cron on change ([3e1b71c](https://gitlab.com/1O/vaultwarden-backup/commit/3e1b71ccbf436216deb3b075910d933680d67370))
+
 ## [2.0.3](https://gitlab.com/1O/vaultwarden-backup/compare/v2.0.2...v2.0.3) (2023-07-01)
 
 
