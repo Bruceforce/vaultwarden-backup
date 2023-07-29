@@ -16,7 +16,7 @@ jobs:
           issue-labels: 'off-topic'
           issue-comment: >
             Thanks for your contribution!
-            
+
             However, this repository does not accept bug reports,
             since this is only a mirror of
             https://gitlab.com/1O/bitwarden_rs-backup.
@@ -25,7 +25,7 @@ jobs:
           skip-closed-issue-comment: true
           pr-comment: >
             Thanks for your contribution!
-          
+
             However, this repository does not accept pull requests,
             since this is only a mirror of
             https://gitlab.com/1O/bitwarden_rs-backup.

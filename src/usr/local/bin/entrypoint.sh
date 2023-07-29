@@ -145,7 +145,7 @@ if [ "$(id -u)" -eq 0 ]; then
   info "Container started"
   info "Running vaultwarden-backup version $VW_BACKUP_VERSION"
   info "Log level set to $LOG_LEVEL"
-  debug "Environment Variables:\n$(env | sort)" 
+  debug "Environment Variables:\n$(env | sort)"
 
   if [ "$1" = "manual" ]; then manual_mode; fi
   if [ "$BACKUP_ON_STARTUP" = true ]; then
