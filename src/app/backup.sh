@@ -101,7 +101,7 @@ perform_healthcheck() {
     debug "Variable \$HEALTHCHECK_URL not set. Skipping health check."
     return 0
   fi
-  
+
   info "Sending health check ping."
   wget "$HEALTHCHECK_URL" -T 10 -t 5 -q -O /dev/null
 }
@@ -109,7 +109,7 @@ perform_healthcheck() {
 cleanup() {
   if [ -n "$DELETE_AFTER" ] && [ "$DELETE_AFTER" -gt 0 ]; then
     if [ "$TIMESTAMP" != true ]; then warn "DELETE_AFTER will most likely have no effect because TIMESTAMP is not set to true."; fi
-    find "$BACKUP_DIR" -type f -mtime +"$DELETE_AFTER" -exec sh -c '. /opt/scripts/logging.sh; file="$1"; rm -f "$file"; info "Deleted backup "$file" after $DELETE_AFTER days"' shell {} \; 
+    find "$BACKUP_DIR" -type f -mtime +"$DELETE_AFTER" -exec sh -c '. /opt/scripts/logging.sh; file="$1"; rm -f "$file"; info "Deleted backup "$file" after $DELETE_AFTER days"' shell {} \;
   fi
 }
 
