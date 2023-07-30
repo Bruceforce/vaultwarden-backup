@@ -1,0 +1,3 @@
+commitizen:
+  name: cz_conventional_commits
+  version_scheme: semver

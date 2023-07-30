@@ -1,6 +1,6 @@
 stages:
-  - push:readme
-  - build-and-release
+- push:readme
+- build-and-release
 
 variables:
   DOCKERHUB_REGISTRY: docker.io
@@ -16,6 +16,13 @@ variables:
   # See https://github.com/docker/buildx/releases
   BUILDX_VERSION: v0.9.1
   BUILDX_ARCH: linux-amd64
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
 
 .docker_login: &docker_login
   docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
@@ -33,13 +40,23 @@ variables:
     - apk add git zip docker curl
     - docker info
     - mkdir -p ~/.docker/cli-plugins
-    - curl -sSLo ~/.docker/cli-plugins/docker-buildx https://github.com/docker/buildx/releases/download/$BUILDX_VERSION/buildx-$BUILDX_VERSION.$BUILDX_ARCH 
+    - curl -sSLo ~/.docker/cli-plugins/docker-buildx https://github.com/docker/buildx/releases/download/$BUILDX_VERSION/buildx-$BUILDX_VERSION.$BUILDX_ARCH
     - chmod +x ~/.docker/cli-plugins/docker-buildx
     - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
     - docker context create my-context
     - docker buildx create --use my-context
     - docker info
     - npm install -g semantic-release @semantic-release/gitlab @semantic-release/git @semantic-release/exec @semantic-release/changelog
+
+pre-commit:
+  stage: .pre
+  image: python:3.11
+  script:
+    - pip install pre-commit
+    - pre-commit run --all-files
+    - pre-commit run --all-files --hook-stage manual commitizen-branch
+  rules:
+    - when: always
 
 build and release:main:
   <<: *docker_build
@@ -50,7 +67,7 @@ build and release:main:
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
 
-build and release:
+build and release:non-main:
   <<: *docker_build
   script:
     - .gitlab/prepare-release.sh 0.0.0-$CI_COMMIT_REF_SLUG
