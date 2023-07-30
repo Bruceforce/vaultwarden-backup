@@ -10,7 +10,7 @@ You might ask yourself "Why should I use a container for backing up my vaultward
 
 Of course you could just create a cron job on your host with something like `sqlite3 "$VW_DATABASE_URL" ".backup '$BACKUP_FILE_DB'"` and back up the additional files and folders (like the attachments folder), using your preferred backup solution.
 
-However on some systems you are not able to add cronjobs by yourself, for example common NAS venderos don't allow this. That's why this image exists. Additionally it also includes the most important files and puts them in a `tar.xz` archive from where on your regular backup software could handle this files.
+However on some systems you are not able to add cronjobs by yourself, for example common NAS vendors don't allow this. That's why this image exists. Additionally it also includes the most important files and puts them in a `tar.xz` archive from where on your regular backup software could handle this files.
 
 ## Which files are included in the backup?
 
