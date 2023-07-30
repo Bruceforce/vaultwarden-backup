@@ -48,6 +48,8 @@ pre-commit:
     - pip install pre-commit
     - pre-commit run --all-files
     - pre-commit run --all-files --hook-stage manual commitizen-branch
+  rules:
+    - when: always
 
 build and release:main:
   <<: *docker_build
