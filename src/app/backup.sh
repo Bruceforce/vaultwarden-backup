@@ -80,7 +80,7 @@ backup() {
       error "Backup failed"
     fi
   fi
-  #rm "$BACKUP_FILE_DB"
+  rm "$BACKUP_FILE_DB"
 }
 
 # Performs a healthcheck
