@@ -126,7 +126,7 @@ For default values see [src/opt/scripts/set-env.sh](src/opt/scripts/set-env.sh)
 | GNUPGHOME                       | GNUPG home folder inside the container (should not be changed)                      |
 | GNUPGHOME_PERMISSIONS           | Permissions of the GNUPGHOME folder (should not be changed)                         |
 | HEALTHCHECK_URL                 | Set a healthcheck url like <https://hc-ping.com/xyz>                                |
-| HEALTHCHECK_FILE                | Set the path of the local healtcheck (container health) file                        |
+| HEALTHCHECK_FILE                | Set the path of the local healthcheck (container health) file                        |
 | HEALTHCHECK_FILE_PERMISSIONS    | Set the permissions of the local healtcheck (container health) file                 |
 | LOG_LEVEL                       | DEBUG, INFO, WARNING, ERROR, CRITICAL are supported                                 |
 | LOG_DIR                         | Path to the logfile folder *inside* the container                                   |
