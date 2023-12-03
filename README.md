@@ -111,6 +111,8 @@ For default values see [src/opt/scripts/set-env.sh](src/opt/scripts/set-env.sh)
 | BACKUP_ADD_ICON_CACHE [^3]      | Set to `true` to include the icon cache folder in the backup                        |
 | BACKUP_ADD_RSA_KEY [^3]         | Set to `true` to include the RSA keys in the backup                                 |
 | BACKUP_ADD_SENDS [^3]           | Set to `true` to include the sends folder in the backup                             |
+| BACKUP_USE_DEDUPE               | Set to `true` to only create new backups if there were changes                      |
+| BACKUP_HASHING_ALGORITHM        | Hashing algorithm to use                                                            |
 | BACKUP_DIR                      | Seths the path of the backup folder *inside* the container                          |
 | BACKUP_DIR_PERMISSIONS          | Sets the permissions of the backup folder (**CAUTION** [^1]). Set to -1 to disable. |
 | BACKUP_ON_STARTUP               | Creates a backup right after container startup                                      |
