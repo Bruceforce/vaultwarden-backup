@@ -165,6 +165,10 @@ Basically there are two workarounds for this issue
 1. Choose a local target for your backup and then use some other tool like `cp` or `rsync` to copy the backup file to your network filesystem.
 2. Disable WAL in Vaultwarden. You can find a guide here (https://github.com/dani-garcia/vaultwarden/wiki/Running-without-WAL-enabled).
 
+### I get an error like "encryption failed: Permission denied" or "find /backup/date-time.tar.xz: Permission denied"
+`gpg: [stdin] encryption failed: Permission denied` is most likey caused by incorrect permissions on the /backup directory.
+If the `BACKUP_DIR_PERMISSIONS` environmental variable is set to `-1`, the permissions for the backups directory on the host machine must be at least xx3.
+
 ### Date Time issues / Wrong timestamp
 If you need timestamps in your local timezone you should mount `/etc/timezone:/etc/timezone:ro` and `/etc/localtime:/etc/localtime:ro`
 like it's done in the [docker-compose.yml](docker-compose.yml). An other possible solution is to set the environment variable accordingly (like  `TZ=Europe/Berlin`)
