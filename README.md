@@ -44,7 +44,7 @@ docker run -d --restart=always --name vaultwarden-backup --volumes-from=vaultwar
 
 Example for backups that delete after 30 days
 ```sh
-docker run -d --restart=always --name vaultwarden --volumes-from=vaultwarden -e TIMESTAMP=true -e DELETE_AFTER=30 bruceforce/vaultwarden-backup
+docker run -d --restart=always --name vaultwarden-backup --volumes-from=vaultwarden -e TIMESTAMP=true -e DELETE_AFTER=30 bruceforce/vaultwarden-backup
 ```
 
 ### Manual Backups
