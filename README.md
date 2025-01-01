@@ -111,7 +111,7 @@ For default values see [src/opt/scripts/set-env.sh](src/opt/scripts/set-env.sh)
 | BACKUP_ADD_ICON_CACHE [^3]      | Set to `true` to include the icon cache folder in the backup                        |
 | BACKUP_ADD_RSA_KEY [^3]         | Set to `true` to include the RSA keys in the backup                                 |
 | BACKUP_ADD_SENDS [^3]           | Set to `true` to include the sends folder in the backup                             |
-| BACKUP_USE_DEDUPE               | Set to `true` to only create new backups if there were changes                      |
+| BACKUP_USE_DEDUPE               | Set to `true` to only create new backups if there were changes (dev tag only)       |
 | BACKUP_HASHING_ALGORITHM        | Hashing algorithm to use                                                            |
 | BACKUP_DIR                      | Seths the path of the backup folder *inside* the container                          |
 | BACKUP_DIR_PERMISSIONS          | Sets the permissions of the backup folder (**CAUTION** [^1]). Set to -1 to disable. |
@@ -130,7 +130,7 @@ For default values see [src/opt/scripts/set-env.sh](src/opt/scripts/set-env.sh)
 | HEALTHCHECK_URL                 | Set a healthcheck url like <https://hc-ping.com/xyz>                                |
 | HEALTHCHECK_FILE                | Set the path of the local healtcheck (container health) file                        |
 | HEALTHCHECK_FILE_PERMISSIONS    | Set the permissions of the local healtcheck (container health) file                 |
-| LOG_LEVEL                       | DEBUG, INFO, WARNING, ERROR, CRITICAL are supported                                 |
+| LOG_LEVEL                       | DEBUG, INFO, WARN, ERROR, CRITICAL are supported                                    |
 | LOG_DIR                         | Path to the logfile folder *inside* the container                                   |
 | LOG_DIR_PERMISSIONS             | Set the permissions of the logfile folder. Set to -1 to disable.                    |
 | TZ                              | Set the timezone inside the container [^2]                                          |
