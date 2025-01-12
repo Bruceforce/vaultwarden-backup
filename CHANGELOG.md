@@ -1,3 +1,10 @@
+# [2.1.0](https://gitlab.com/1O/vaultwarden-backup/compare/v2.0.4...v2.1.0) (2025-01-12)
+
+
+### Features
+
+* Added feature to skip backups if there are no changes ([3923862](https://gitlab.com/1O/vaultwarden-backup/commit/3923862bc41b5e85f58ebaa608c56568ad890367)), closes [#34](https://gitlab.com/1O/vaultwarden-backup/issues/34)
+
 ## [2.0.4](https://gitlab.com/1O/vaultwarden-backup/compare/v2.0.3...v2.0.4) (2023-07-04)
 
 
