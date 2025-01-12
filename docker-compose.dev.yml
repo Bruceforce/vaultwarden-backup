@@ -1,5 +1,3 @@
----
-version: '3.7'
 services:
   vaultwarden:
     image: vaultwarden/server
@@ -17,7 +15,7 @@ services:
     container_name: vaultwarden-backup
     build: .
     #user: 1000:1000
-    restart: always
+    restart: on-failure
     init: true
     depends_on:
       - vaultwarden
@@ -30,8 +28,9 @@ services:
       - BACKUP_ADD_DATABASE=true
       - BACKUP_ADD_ATTACHMENTS=true
       - BACKUP_ADD_CONFIG_JSON=true
+      - BACKUP_USE_DEDUPE=true
       #- DELETE_AFTER=1
-      - TIMESTAMP=true
+      - TIMESTAMP=false
       - CRON_TIME=*/1 * * * *
       - TZ=Europe/Berlin
       - UID=1000

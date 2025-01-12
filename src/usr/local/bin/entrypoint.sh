@@ -96,6 +96,10 @@ init_folders() {
     printf 0 > "$HEALTHCHECK_FILE"
   fi
 
+  if [ "$BACKUP_USE_DEDUPE" = true ] && [ ! -f "$BACKUP_INI" ]; then
+    touch "$BACKUP_INI" && chown "$UID:$GID" "$BACKUP_INI"
+  fi
+
   if [ ! "$ENCRYPTION_BASE64_GPG_KEY" = false ] || [ ! "$ENCRYPTION_PASSWORD" = false ]; then
     install -o "$UID" -g "$GID" -m "$GNUPGHOME_PERMISSIONS" -d "$GNUPGHOME"
     # Run a "dummy" gpg command to generate the keyring. The keyring is needed since gpg > v2.1
