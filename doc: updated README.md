@@ -150,8 +150,8 @@ For default values see [src/opt/scripts/set-env.sh](src/opt/scripts/set-env.sh)
 
 ### I have deduplication enabled but backups are created even if there were no changes
 
-The Vaultwarden database and files can change even if there were not changes in the entries itself.
-For example there are values such as `last_used` which are altered even if you only access an entry (see #33 for more details). I decided to **not** include an ignore filter or similar to ignore these changes, because this would likely break when vaultwarden makes a change to the database structure.
+The Vaultwarden database and files can change even if there were no changes in the entries itself.
+For example there are values such as `last_used` which are altered even if you only access an entry (see #37 for more details). I decided to **not** include an ignore filter or similar to ignore these changes, because this would likely break when vaultwarden makes a change to the database structure.
 For me it's more important to have a working backup than to save a few kilobytes.
 Therefore the deduplication feature might not work as you expect.
 
