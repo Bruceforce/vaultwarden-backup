@@ -1,3 +1,10 @@
+## [2.1.1](https://gitlab.com/1O/vaultwarden-backup/compare/v2.1.0...v2.1.1) (2025-11-02)
+
+
+### Bug Fixes
+
+* provide key details for failed asymmetric backups ([97a8d2b](https://gitlab.com/1O/vaultwarden-backup/commit/97a8d2b17ceec02145adebdd879a1b5d8d066716))
+
 # [2.1.0](https://gitlab.com/1O/vaultwarden-backup/compare/v2.0.4...v2.1.0) (2025-01-12)
 
 
