@@ -192,7 +192,7 @@ like it's done in the [docker-compose.yml](docker-compose.yml). An other possibl
 
 The  main reason to build this image was to allow users to run sheduled tasks where their host OS does not allow them to do so, or where they want a "portable" way of using a scheduled tasks without relying on host OS mechanisms.
 
-Since `crond` *must* be run as root user there is no way to start this container as a non-root user while using cron. I'm aware that there are other task schedulers like [supercronic](https://github.com/aptible/supercronic) which allow to run without root privileges but I want to stay with the standard and established cron system for the time being.
+Since `crond` **must** be run as root user there is no way to start this container as a non-root user while using cron. I'm aware that there are other task schedulers like [supercronic](https://github.com/aptible/supercronic) which allow to run without root privileges but I want to stay with the standard and established cron system for the time being.
 
 ### Why sh is used instead of bash
 
