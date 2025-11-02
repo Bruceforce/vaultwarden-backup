@@ -1,4 +1,5 @@
 stages:
+- deploy
 - push:readme
 - build-and-release
 
@@ -16,13 +17,19 @@ variables:
   # See https://github.com/docker/buildx/releases
   BUILDX_VERSION: v0.9.1
   BUILDX_ARCH: linux-amd64
+  RENOVATE_EXTRA_FLAGS: 1O/vaultwarden-backup
 
 workflow:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_PIPELINE_SOURCE == "schedule"
     - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
       when: never
     - if: $CI_COMMIT_BRANCH
+
+include:
+  - project: "renovate-bot/renovate-runner"
+    file: "/templates/renovate.gitlab-ci.yml"
 
 .docker_login: &docker_login
   docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY

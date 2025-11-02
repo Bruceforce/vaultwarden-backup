@@ -1,0 +1,23 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": [
+        "config:best-practices",
+        "customManagers:dockerfileVersions"
+    ],
+    "packageRules": [
+        {
+            "description": "Use fix as commit type for Image updates and allow automerge",
+            "matchUpdateTypes": [
+                "major",
+                "minor",
+                "patch"
+            ],
+            "matchManagers": [
+                "dockerfile",
+                "docker-compose"
+            ],
+            "semanticCommitType": "fix",
+            "automerge": true
+        }
+    ]
+}
