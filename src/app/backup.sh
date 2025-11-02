@@ -155,7 +155,7 @@ create_asym_encrypted_backup() {
       info "Successfully created gpg (public key) encrypted backup $BACKUP_FILE_ARCHIVE"
       return 0
     else
-      error "Encrypted backup failed!"
+      error "Encrypted backup failed! Maybe your key has expired or is invalid. You find the key details below.\n$(cat "$ENCRYPTION_GPG_KEYFILE_LOCATION" | gpg --import-options show-only --import)"
       return 1
     fi
   fi
