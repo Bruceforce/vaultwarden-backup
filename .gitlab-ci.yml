@@ -15,7 +15,7 @@ variables:
   DOCKER_TLS_VERIFY: 1
   DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
   # See https://github.com/docker/buildx/releases
-  BUILDX_VERSION: v0.9.1
+  BUILDX_VERSION: v0.30.1
   BUILDX_ARCH: linux-amd64
   RENOVATE_EXTRA_FLAGS: 1O/vaultwarden-backup
 
