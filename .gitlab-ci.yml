@@ -57,7 +57,7 @@ include:
 
 pre-commit:
   stage: .pre
-  image: python:3.11
+  image: python:3.14
   script:
     - pip install pre-commit
     - pre-commit run --all-files
