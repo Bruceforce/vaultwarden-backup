@@ -1,3 +1,10 @@
+## [2.1.2](https://gitlab.com/1O/vaultwarden-backup/compare/v2.1.1...v2.1.2) (2025-12-07)
+
+
+### Bug Fixes
+
+* **deps:** update alpine docker tag to v3.23.0 ([811a7a9](https://gitlab.com/1O/vaultwarden-backup/commit/811a7a956902b05d44c34de01dc290a0dadb1706))
+
 ## [2.1.1](https://gitlab.com/1O/vaultwarden-backup/compare/v2.1.0...v2.1.1) (2025-11-02)
 
 
