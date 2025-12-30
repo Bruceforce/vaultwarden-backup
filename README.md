@@ -30,7 +30,7 @@ you have to replace the container name in the `--volumes-from` section of the `d
 
 A cron daemon is running inside the container and the container keeps running in background.
 
-The easiest way to use this is by adjusting the [docker-compose.yml](docker-compose.yml) to your needs. Below you find some example commands using `docker run`
+The easiest way to use this is by adjusting the [compose.yml](compose.yml) to your needs. Below you find some example commands using `docker run`
 
 Start backup container with default settings (automatic backup at 5 am)
 ```sh
@@ -175,6 +175,66 @@ Basically there are two workarounds for this issue
 1. Choose a local target for your backup and then use some other tool like `cp` or `rsync` to copy the backup file to your network filesystem.
 2. Disable WAL in Vaultwarden. You can find a guide here (https://github.com/dani-garcia/vaultwarden/wiki/Running-without-WAL-enabled).
 
+### I get an errors in the cp operation like "Operation not permitted"
+
+If you see errors during `cp` operating such as:
+
+```txt
+cp: can't preserve ownership of '/tmp/backupfiles/attachments': Operation not permitted
+...
+cp: can't preserve ownership of '/tmp/backupfiles/rsa_key.pem': Operation not permitted
+```
+
+it usually means that there are some permission issues. You should make sure that the `valutwarden-backup` container is running with the exact same permissions as your vaultwarden container. You can verify the issue if you compare your vaultwarden data to the data `vaultwarden-backup` produces. The permissions should be the same.
+
+If you experience this error it may look like this:
+
+```
+# ls -la vaultwarden/data/
+...
+drwxr-xr-x 3 myuser root   4096 Dec 25  2020 attachments
+-rw-r--r-- 1 myuser root   1661 Jul 14  2021 config.json
+-rw-r--r-- 1 myuser root 278528 Dec 29 13:37 db.sqlite3
+...
+# ls -la vaultwarden/backup/
+...
+-rw-r--r-- 1 myuser 1005 33548 Dec 30 06:00 backup.tar.xz
+```
+
+But it should look like this:
+
+```
+# ls -la vaultwarden/data/
+...
+drwxr-xr-x 3 myuser root   4096 Dec 25  2020 attachments
+-rw-r--r-- 1 myuser root   1661 Jul 14  2021 config.json
+-rw-r--r-- 1 myuser root 278528 Dec 29 13:37 db.sqlite3
+...
+# ls -la vaultwarden/backup/
+...
+-rw-r--r-- 1 myuser root 33548 Dec 30 06:00 backup.tar.xz
+```
+
+The first example indicates the `vaultwarden-backup` container is running with the UID of myuser and GID of 1005, while the vaultwarden container is running with the UID of myuser and the GID of root (0). In that case you must either adjust the user in the vaultwarden container itself or in `vaultwarden-backup`.
+
+The compose file could look similar to the example shown below:
+
+```yml
+services:
+  vaultwarden:
+    image: ghcr.io/dani-garcia/vaultwarden:latest
+    user: 1000:0
+    ...
+
+  vaultwarden-backup:
+    image: bruceforce/vaultwarden-backup:latest
+    environment:
+      - UID=1000
+      - GID=0
+      ...
+    ...
+```
+
 ### I get an error like "encryption failed: Permission denied" or "find /backup/date-time.tar.xz: Permission denied"
 
 `gpg: [stdin] encryption failed: Permission denied` is most likey caused by incorrect permissions on the /backup directory.
@@ -183,7 +243,7 @@ If the `BACKUP_DIR_PERMISSIONS` environmental variable is set to `-1`, the permi
 ### Date Time issues / Wrong timestamp
 
 If you need timestamps in your local timezone you should mount `/etc/timezone:/etc/timezone:ro` and `/etc/localtime:/etc/localtime:ro`
-like it's done in the [docker-compose.yml](docker-compose.yml). An other possible solution is to set the environment variable accordingly (like  `TZ=Europe/Berlin`)
+like it's done in the [compose.yml](compose.yml). An other possible solution is to set the environment variable accordingly (like  `TZ=Europe/Berlin`)
 (see <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones> for more information).
 
 **Attention** if you are on an ARM based platform please note that [alpine](https://alpinelinux.org/) is used as base image for this project to keep things small. Since alpine 3.13 and above it's possible that you will end up with a container with broken time and date settings (i.e. year 1900). This is a known problem in the alpine project (see [Github issue](https://github.com/alpinelinux/docker-alpine/issues/141) and [solution](https://wiki.alpinelinux.org/wiki/Release_Notes_for_Alpine_3.13.0#time64_requirements)) and there is nothing I can do about it. However in the [alpine wiki](https://wiki.alpinelinux.org/wiki/Release_Notes_for_Alpine_3.13.0#time64_requirements) a solution is being proposed which I also tested tested on my raspberry pi. After following the described process it started working again as expected. If you still experience issues or could for some reason not apply the aforementioned fixes please feel free to open an issue.
