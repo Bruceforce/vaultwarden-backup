@@ -1,5 +1,5 @@
 ARG ARCH=
-FROM ${ARCH}alpine:3.24.1
+FROM ${ARCH}alpine:3.24.2
 
 RUN apk add --no-cache \
     sqlite \
